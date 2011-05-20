@@ -170,7 +170,7 @@ function AgendaView(element, calendar, viewName) {
 		var d;
 		var maxd;
 		var minutes;
-		var slotNormal = opt('slotMinutes') % 15 == 0;
+		var slotNormal = opt('slotPattern') != null ? false :  opt('slotMinutes') % 15 == 0;
 		
 		s =
 			"<table style='width:100%' class='fc-agenda-days fc-border-separate' cellspacing='0'>" +
