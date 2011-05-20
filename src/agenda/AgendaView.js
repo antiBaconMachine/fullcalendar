@@ -288,7 +288,7 @@ function AgendaView(element, calendar, viewName) {
 				"<div style='position:relative'>&nbsp;</div>" +
 				"</td>" +
 				"</tr>";
-			addMinutes(d, opt('slotMinutes'));
+			addMinutes(d, getSlotMinutes(i));
 			slotCnt++;
 		}
 		s +=
@@ -302,6 +302,14 @@ function AgendaView(element, calendar, viewName) {
 		axisFirstCells = axisFirstCells.add(slotTable.find('th:first'));
 	}
 	
+	function getSlotMinutes(i) {
+		var slotPattern = opt('slotPattern');
+		var ret = opt('slotMinutes');
+		if (slotPattern) {
+			ret = slotPattern[i] || ret;
+		}
+		return ret;
+	}
 	
 	
 	function updateCells() {
