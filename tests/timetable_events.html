@@ -7,14 +7,14 @@
 	$(document).ready(function() {
 		
 		$('#calendar').fullCalendar({
-			defaultView: 'agendaTimetable',
+			defaultView: 'agendaTimetableWeek',
 			year: 2009,
 			month: 11,
 			date: 16,
 			header: {
 				left: 'prev,next today',
 				center: 'title',
-				right: 'month,agendaWeek,basicWeek,agendaDay,basicDay'
+				right: 'month,agendaWeek,agendaTimetableWeek,basicWeek,agendaDay,basicDay'
 			},
 			minTime : "8:30",
 			editable: true,
