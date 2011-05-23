@@ -7,20 +7,20 @@
 	$(document).ready(function() {
 		
 		$('#calendar').fullCalendar({
-			defaultView: 'agendaTimetableWeek',
+			defaultView: 'timetableWeek',
 			year: 2009,
 			month: 11,
 			date: 16,
 			header: {
 				left: 'prev,next today',
 				center: 'title',
-				right: 'month,agendaWeek,agendaTimetableWeek,basicWeek,agendaDay,basicDay'
+				right: 'timetableWeek'
 			},
 			minTime : "8:30",
 			editable: true,
 			slotMinutes : 60,
 			slotPattern : {
-				agenda : [20, 40,40,40,40,20,40,40,60,40,40]
+				timetable : [20, 40,40,40,40,20,40,40,60,40,40]
 			},
 			varriableSlotHeights : true
 		});
