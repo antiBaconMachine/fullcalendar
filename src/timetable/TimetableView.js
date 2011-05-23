@@ -259,7 +259,7 @@ function TimetableView(element, calendar, viewName) {
 		}
 		
 		slotScroller =
-			$("<div style='position:absolute;width:100%;overflow-x:hidden;overflow-y:auto'/>")
+			$("<div class='slotScroller' style='position:absolute;width:100%;overflow-x:hidden;overflow-y:auto'/>")
 				.appendTo(slotLayer);
 				
 		slotContent =
@@ -278,15 +278,14 @@ function TimetableView(element, calendar, viewName) {
 		addMinutes(d, minMinute);
 		
 		var totalMinutes = getTotalMinutes(cloneDate(d), maxd);
-		var height = null;
 		for (i=0; d < maxd; i++) {
 			var slotLength = getSlotMinutes(i);
-			var slotHeight = getSlotHeight(slotLength, totalMinutes, height);
+			var slotHeight = getSlotHeight(slotLength, totalMinutes);
 			minutes = d.getMinutes();
 			s +=
-				"<tr class='fc-slot" + i + ' ' + (!minutes ? '' : 'fc-minor') + "'>" +
-				"<th class='fc-timetable-axis " + headerClass + "' height='" + 
+				"<tr class='fc-slot" + i + ' ' + (!minutes ? '' : 'fc-minor') + "'  height='" + 
 					slotHeight +"'>" +
+				"<th class='fc-timetable-axis " + headerClass + "'>" +
 				((!slotNormal || !minutes) ? formatDate(d, opt('axisFormat')) : '&nbsp;') +
 				"</th>" +
 				"<td class='" + contentClass + "'>" +
@@ -317,13 +316,16 @@ function TimetableView(element, calendar, viewName) {
 	
 	function getSlotHeight(slotLength, totalMinutes) {
 		if (opt('varriableSlotHeights')) {
-			return (slotLength / totalMinutes * 100) + "%";
+			return Math.round(slotLength / totalMinutes * 100) + "%";
 		}
 		return "auto";
 	}
 	
 	function getTotalMinutes(begin, end) {
-		var start = begin.getTime();
+		return parseInt((end.getTime() - begin.getTime()) / (1000 * 60));
+	}
+	
+	function getSlotCount(begin, end) {
 		var count = 0;
 		var slotPattern = opt('slotPattern');
 		var defaultSlot = opt('slotMinutes');
@@ -340,7 +342,7 @@ function TimetableView(element, calendar, viewName) {
 			addMinutes(begin, defaultSlot);
 			count++;
 		}
-		return parseInt((end.getTime() - start) / (1000 * 60));
+		return count;
 	}
 	
 	function updateCells() {
