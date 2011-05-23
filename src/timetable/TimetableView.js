@@ -7,10 +7,10 @@ setDefaults({
 	defaultEventMinutes: 120,
 	axisFormat: 'h(:mm)tt',
 	timeFormat: {
-		agenda: 'h:mm{ - h:mm}'
+		timetable: 'h:mm{ - h:mm}'
 	},
 	dragOpacity: {
-		agenda: .5
+		timetable: .5
 	},
 	minTime: 0,
 	maxTime: 24
@@ -128,7 +128,7 @@ function TimetableView(element, calendar, viewName) {
 	-----------------------------------------------------------------------------*/
 	
 	
-	disableTextSelection(element.addClass('fc-agenda'));
+	disableTextSelection(element.addClass('fc-timetable'));
 	
 	
 	function renderAgenda(c) {
@@ -173,21 +173,21 @@ function TimetableView(element, calendar, viewName) {
 		var slotNormal = opt('slotPattern') != null ? false :  opt('slotMinutes') % 15 == 0;
 		
 		s =
-			"<table style='width:100%' class='fc-agenda-days fc-border-separate' cellspacing='0'>" +
+			"<table style='width:100%' class='fc-timetable-days fc-border-separate' cellspacing='0'>" +
 			"<thead>" +
 			"<tr>" +
-			"<th class='fc-agenda-axis " + headerClass + "'>&nbsp;</th>";
+			"<th class='fc-timetable-axis " + headerClass + "'>&nbsp;</th>";
 		for (i=0; i<colCnt; i++) {
 			s +=
 				"<th class='fc- fc-col" + i + ' ' + headerClass + "'/>"; // fc- needed for setDayID
 		}
 		s +=
-			"<th class='fc-agenda-gutter " + headerClass + "'>&nbsp;</th>" +
+			"<th class='fc-timetable-gutter " + headerClass + "'>&nbsp;</th>" +
 			"</tr>" +
 			"</thead>" +
 			"<tbody>" +
 			"<tr>" +
-			"<th class='fc-agenda-axis " + headerClass + "'>&nbsp;</th>";
+			"<th class='fc-timetable-axis " + headerClass + "'>&nbsp;</th>";
 		for (i=0; i<colCnt; i++) {
 			s +=
 				"<td class='fc- fc-col" + i + ' ' + contentClass + "'>" + // fc- needed for setDayID
@@ -199,7 +199,7 @@ function TimetableView(element, calendar, viewName) {
 				"</td>";
 		}
 		s +=
-			"<td class='fc-agenda-gutter " + contentClass + "'>&nbsp;</td>" +
+			"<td class='fc-timetable-gutter " + contentClass + "'>&nbsp;</td>" +
 			"</tr>" +
 			"</tbody>" +
 			"</table>";
@@ -216,7 +216,7 @@ function TimetableView(element, calendar, viewName) {
 		markFirstLast(dayBody.add(dayBody.find('tr')));
 		
 		axisFirstCells = dayHead.find('th:first');
-		gutterCells = dayTable.find('.fc-agenda-gutter');
+		gutterCells = dayTable.find('.fc-timetable-gutter');
 		
 		slotLayer =
 			$("<div style='position:absolute;z-index:2;left:0;width:100%'/>")
@@ -229,13 +229,13 @@ function TimetableView(element, calendar, viewName) {
 					.appendTo(slotLayer);
 		
 			s =
-				"<table style='width:100%' class='fc-agenda-allday' cellspacing='0'>" +
+				"<table style='width:100%' class='fc-timetable-allday' cellspacing='0'>" +
 				"<tr>" +
-				"<th class='" + headerClass + " fc-agenda-axis'>" + opt('allDayText') + "</th>" +
+				"<th class='" + headerClass + " fc-timetable-axis'>" + opt('allDayText') + "</th>" +
 				"<td>" +
 				"<div class='fc-day-content'><div style='position:relative'/></div>" +
 				"</td>" +
-				"<th class='" + headerClass + " fc-agenda-gutter'>&nbsp;</th>" +
+				"<th class='" + headerClass + " fc-timetable-gutter'>&nbsp;</th>" +
 				"</tr>" +
 				"</table>";
 			allDayTable = $(s).appendTo(slotLayer);
@@ -244,11 +244,11 @@ function TimetableView(element, calendar, viewName) {
 			dayBind(allDayRow.find('td'));
 			
 			axisFirstCells = axisFirstCells.add(allDayTable.find('th:first'));
-			gutterCells = gutterCells.add(allDayTable.find('th.fc-agenda-gutter'));
+			gutterCells = gutterCells.add(allDayTable.find('th.fc-timetable-gutter'));
 			
 			slotLayer.append(
-				"<div class='fc-agenda-divider " + headerClass + "'>" +
-				"<div class='fc-agenda-divider-inner'/>" +
+				"<div class='fc-timetable-divider " + headerClass + "'>" +
+				"<div class='fc-timetable-divider-inner'/>" +
 				"</div>"
 			);
 			
@@ -271,18 +271,22 @@ function TimetableView(element, calendar, viewName) {
 				.appendTo(slotContent);
 		
 		s =
-			"<table class='fc-agenda-slots' style='width:100%' cellspacing='0'>" +
+			"<table class='fc-timetable-slots' style='width:100%' cellspacing='0'>" +
 			"<tbody>";
 		d = zeroDate();
 		maxd = addMinutes(cloneDate(d), maxMinute);
 		addMinutes(d, minMinute);
-		slotCnt = 0;
+		
+		var totalMinutes = getTotalMinutes(cloneDate(d), maxd);
+		var height = null;
 		for (i=0; d < maxd; i++) {
 			var slotLength = getSlotMinutes(i);
+			var slotHeight = getSlotHeight(slotLength, totalMinutes, height);
 			minutes = d.getMinutes();
 			s +=
 				"<tr class='fc-slot" + i + ' ' + (!minutes ? '' : 'fc-minor') + "'>" +
-				"<th class='fc-agenda-axis " + headerClass + "' style='height :"+ getSlotHeight(slotLength) +"'>" +
+				"<th class='fc-timetable-axis " + headerClass + "' height='" + 
+					slotHeight +"'>" +
 				((!slotNormal || !minutes) ? formatDate(d, opt('axisFormat')) : '&nbsp;') +
 				"</th>" +
 				"<td class='" + contentClass + "'>" +
@@ -290,7 +294,6 @@ function TimetableView(element, calendar, viewName) {
 				"</td>" +
 				"</tr>";
 			addMinutes(d, slotLength);
-			slotCnt++;
 		}
 		s +=
 			"</tbody>" +
@@ -312,11 +315,32 @@ function TimetableView(element, calendar, viewName) {
 		return ret;
 	}
 	
-	function getSlotHeight(slotLength) {
+	function getSlotHeight(slotLength, totalMinutes) {
 		if (opt('varriableSlotHeights')) {
-			return (slotLength / ((60*24) * 100)) + "%";
+			return (slotLength / totalMinutes * 100) + "%";
 		}
 		return "auto";
+	}
+	
+	function getTotalMinutes(begin, end) {
+		var start = begin.getTime();
+		var count = 0;
+		var slotPattern = opt('slotPattern');
+		var defaultSlot = opt('slotMinutes');
+		if (slotPattern.length) {
+			for (var i in slotPattern) {
+				addMinutes(begin, slotPattern[i]);
+				count++;
+				if (begin >= end) {
+					break;
+				}
+			}
+		}
+		while (begin < end) {
+			addMinutes(begin, defaultSlot);
+			count++;
+		}
+		return parseInt((end.getTime() - start) / (1000 * 60));
 	}
 	
 	function updateCells() {
