@@ -1,7 +1,7 @@
 
-fcViews.agendaTimetableWeek = AgendaTimetableWeekView;
+fcViews.timetableWeek = TimetableWeekView;
 
-function AgendaTimetableWeekView(element, calendar) {
+function TimetableWeekView(element, calendar) {
 	var t = this;
 	
 	
@@ -10,7 +10,7 @@ function AgendaTimetableWeekView(element, calendar) {
 	
 	
 	// imports
-	AgendaView.call(t, element, calendar, 'agendaTimetableWeek');
+	TimetableView.call(t, element, calendar, 'timetableWeek');
 	var opt = t.opt;
 	var renderAgenda = t.renderAgenda;
 	var formatDates = calendar.formatDates;

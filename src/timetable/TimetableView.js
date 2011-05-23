@@ -21,7 +21,7 @@ setDefaults({
 // TODO: test liquid width, especially in IE6
 
 
-function AgendaView(element, calendar, viewName) {
+function TimetableView(element, calendar, viewName) {
 	var t = this;
 	
 	
@@ -170,7 +170,7 @@ function AgendaView(element, calendar, viewName) {
 		var d;
 		var maxd;
 		var minutes;
-		var slotNormal = opt('slotMinutes') % 15 == 0;
+		var slotNormal = opt('slotPattern') != null ? false :  opt('slotMinutes') % 15 == 0;
 		
 		s =
 			"<table style='width:100%' class='fc-agenda-days fc-border-separate' cellspacing='0'>" +
@@ -278,17 +278,18 @@ function AgendaView(element, calendar, viewName) {
 		addMinutes(d, minMinute);
 		slotCnt = 0;
 		for (i=0; d < maxd; i++) {
+			var slotLength = getSlotMinutes(i);
 			minutes = d.getMinutes();
 			s +=
 				"<tr class='fc-slot" + i + ' ' + (!minutes ? '' : 'fc-minor') + "'>" +
-				"<th class='fc-agenda-axis " + headerClass + "'>" +
+				"<th class='fc-agenda-axis " + headerClass + "' style='height :"+ getSlotHeight(slotLength) +"'>" +
 				((!slotNormal || !minutes) ? formatDate(d, opt('axisFormat')) : '&nbsp;') +
 				"</th>" +
 				"<td class='" + contentClass + "'>" +
 				"<div style='position:relative'>&nbsp;</div>" +
 				"</td>" +
 				"</tr>";
-			addMinutes(d, opt('slotMinutes'));
+			addMinutes(d, slotLength);
 			slotCnt++;
 		}
 		s +=
@@ -302,7 +303,21 @@ function AgendaView(element, calendar, viewName) {
 		axisFirstCells = axisFirstCells.add(slotTable.find('th:first'));
 	}
 	
+	function getSlotMinutes(i) {
+		var slotPattern = opt('slotPattern');
+		var ret = opt('slotMinutes');
+		if (slotPattern) {
+			ret = slotPattern[i] || ret;
+		}
+		return ret;
+	}
 	
+	function getSlotHeight(slotLength) {
+		if (opt('varriableSlotHeights')) {
+			return (slotLength / ((60*24) * 100)) + "%";
+		}
+		return "auto";
+	}
 	
 	function updateCells() {
 		var i;
