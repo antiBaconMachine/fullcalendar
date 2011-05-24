@@ -121,10 +121,7 @@ function TimetableView(element, calendar, viewName) {
 	var rtl, dis, dit;  // day index sign / translate
 	var minMinute, maxMinute;
 	var colFormat;
-	
-	var slotHeights=[];
 
-	
 	/* Rendering
 	-----------------------------------------------------------------------------*/
 	
@@ -280,11 +277,10 @@ function TimetableView(element, calendar, viewName) {
 		var totalMinutes = getTotalMinutes(cloneDate(d), maxd);
 		for (i=0; d < maxd; i++) {
 			var slotLength = getSlotMinutes(i);
-			slotHeights[i] = getSlotHeight(slotLength, totalMinutes);
 			minutes = d.getMinutes();
 			s +=
 				"<tr class='fc-slot" + i + ' ' + (!minutes ? '' : 'fc-minor') + "' \n\
-					+ height='"+ slotHeights[i] +"' >" +
+					+ height='"+ getSlotHeight(slotLength, totalMinutes) +"' >" +
 				"<th class='fc-timetable-axis " + headerClass + "'>" +
 				((!slotNormal || !minutes) ? formatDate(d, opt('axisFormat')) : '&nbsp;') +
 				"</th>" +
@@ -397,19 +393,6 @@ function TimetableView(element, calendar, viewName) {
 		if (dateChanged) {
 			resetScroll();
 		}
-		//setSlotHeights(ssh);
-	}
-	
-	function setSlotHeights(height) {
-		height = height || slotScroller.height();
-		$("table.fc-timetable-slots tr").each(function(i, e) {
-			var proportion = slotHeights[i];
-			if (proportion) {
-				jQuery(e).height(
-					proportion === "auto" ? "auto" : proportion * height + "px"
-					);
-			}
-		});
 	}
 	
 	function setWidth(width) {
