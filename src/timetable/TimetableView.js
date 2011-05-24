@@ -227,16 +227,14 @@ function TimetableView(element, calendar, viewName) {
 					.appendTo(slotLayer);
 		
 			s =
-				"<table style='width:100%' class='fc-timetable-allday' cellspacing='0'>" +
-				"<tr>" +
-				"<th class='" + headerClass + " fc-timetable-axis'>" + opt('allDayText') + "</th>" +
-				"<td>" +
-				"<div class='fc-day-content'><div style='position:relative'/></div>" +
-				"</td>" +
-				"<th class='" + headerClass + " fc-timetable-gutter'>&nbsp;</th>" +
-				"</tr>" +
-				"</table>";
-			allDayTable = $(s).appendTo(slotLayer);
+				$("<table style='width:100%' class='fc-timetable-allday' cellspacing='0'>")
+				.append($("<tr>")
+					.append($("<th class='" + headerClass + " fc-timetable-axis'>" + opt('allDayText') + "</th>" + "<td>")
+					.append($("<div class='fc-day-content'><div style='position:relative'/></div>"))
+				)
+				.append($("<th class='" + headerClass + " fc-timetable-gutter'>&nbsp;</th>")));
+				
+			allDayTable = s.appendTo(slotLayer);
 			allDayRow = allDayTable.find('tr');
 			
 			dayBind(allDayRow.find('td'));
