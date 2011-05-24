@@ -283,7 +283,8 @@ function TimetableView(element, calendar, viewName) {
 			slotHeights[i] = getSlotHeight(slotLength, totalMinutes);
 			minutes = d.getMinutes();
 			s +=
-				"<tr class='fc-slot" + i + ' ' + (!minutes ? '' : 'fc-minor') + "'>" +
+				"<tr class='fc-slot" + i + ' ' + (!minutes ? '' : 'fc-minor') + "' \n\
+					+ height='"+ slotHeights[i] +"' >" +
 				"<th class='fc-timetable-axis " + headerClass + "'>" +
 				((!slotNormal || !minutes) ? formatDate(d, opt('axisFormat')) : '&nbsp;') +
 				"</th>" +
@@ -315,7 +316,7 @@ function TimetableView(element, calendar, viewName) {
 	
 	function getSlotHeight(slotLength, totalMinutes) {
 		if (opt('varriableSlotHeights')) {
-			return slotLength / totalMinutes;
+			return slotLength / totalMinutes * 100 + "%";
 		}
 		return "auto";
 	}
@@ -396,7 +397,7 @@ function TimetableView(element, calendar, viewName) {
 		if (dateChanged) {
 			resetScroll();
 		}
-		setSlotHeights(ssh);
+		//setSlotHeights(ssh);
 	}
 	
 	function setSlotHeights(height) {
