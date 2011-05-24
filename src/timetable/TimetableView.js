@@ -316,7 +316,9 @@ function TimetableView(element, calendar, viewName) {
 	
 	function getSlotHeight(slotLength, totalMinutes) {
 		if (opt('varriableSlotHeights')) {
-			return Math.round(slotLength / totalMinutes * 100) + "%";
+			var height = slotScroller.height();
+			var wedge =  Math.round(slotLength / totalMinutes);
+			return wedge * height + "px";
 		}
 		return "auto";
 	}
@@ -368,6 +370,7 @@ function TimetableView(element, calendar, viewName) {
 	
 	
 	function setHeight(height, dateChanged) {
+		var fixedHeight = height !== undefined;
 		if (height === undefined) {
 			height = viewHeight;
 		}
@@ -376,10 +379,12 @@ function TimetableView(element, calendar, viewName) {
 	
 		var headHeight = dayBody.position().top;
 		var allDayHeight = slotScroller.position().top; // including divider
-		var bodyHeight = Math.min( // total body height, including borders
-			height - headHeight,   // when scrollbars
+		var bodyHeight = height - headHeight;
+		if (!fixedHeight) {
+			bodyHeaight = Math.min( // total body height, including borders
+			bodyHeight,   // when scrollbars
 			slotTable.height() + allDayHeight + 1 // when no scrollbars. +1 for bottom border
-		);
+		)}
 		
 		dayBodyFirstCellStretcher
 			.height(bodyHeight - vsides(dayBodyFirstCell));
