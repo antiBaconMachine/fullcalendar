@@ -122,6 +122,7 @@ function TimetableView(element, calendar, viewName) {
 	var minMinute, maxMinute;
 	var colFormat;
 	
+	var slotHeights=[];
 
 	
 	/* Rendering
@@ -276,15 +277,13 @@ function TimetableView(element, calendar, viewName) {
 		d = zeroDate();
 		maxd = addMinutes(cloneDate(d), maxMinute);
 		addMinutes(d, minMinute);
-		
 		var totalMinutes = getTotalMinutes(cloneDate(d), maxd);
 		for (i=0; d < maxd; i++) {
 			var slotLength = getSlotMinutes(i);
-			var slotHeight = getSlotHeight(slotLength, totalMinutes);
+			slotHeights[i] = getSlotHeight(slotLength, totalMinutes);
 			minutes = d.getMinutes();
 			s +=
-				"<tr class='fc-slot" + i + ' ' + (!minutes ? '' : 'fc-minor') + "'  height='" + 
-					slotHeight +"'>" +
+				"<tr class='fc-slot" + i + ' ' + (!minutes ? '' : 'fc-minor') + "'>" +
 				"<th class='fc-timetable-axis " + headerClass + "'>" +
 				((!slotNormal || !minutes) ? formatDate(d, opt('axisFormat')) : '&nbsp;') +
 				"</th>" +
@@ -316,9 +315,7 @@ function TimetableView(element, calendar, viewName) {
 	
 	function getSlotHeight(slotLength, totalMinutes) {
 		if (opt('varriableSlotHeights')) {
-			var height = slotScroller.height();
-			var wedge =  Math.round(slotLength / totalMinutes);
-			return wedge * height + "px";
+			return slotLength / totalMinutes;
 		}
 		return "auto";
 	}
@@ -391,16 +388,28 @@ function TimetableView(element, calendar, viewName) {
 		
 		slotLayer.css('top', headHeight);
 		
-		slotScroller.height(bodyHeight - allDayHeight - 1);
+		var ssh = bodyHeight - allDayHeight - 1
+		slotScroller.height(ssh);
 		
 		slotHeight = slotTableFirstInner.height() + 1; // +1 for border
 		
 		if (dateChanged) {
 			resetScroll();
 		}
+		setSlotHeights(ssh);
 	}
 	
-	
+	function setSlotHeights(height) {
+		height = height || slotScroller.height();
+		$("table.fc-timetable-slots tr").each(function(i, e) {
+			var proportion = slotHeights[i];
+			if (proportion) {
+				jQuery(e).height(
+					proportion === "auto" ? "auto" : proportion * height + "px"
+					);
+			}
+		});
+	}
 	
 	function setWidth(width) {
 		viewWidth = width;
