@@ -297,8 +297,10 @@ function TimetableView(element, calendar, viewName) {
 				.append(
 					$("<td>")
 					.addClass(contentClass)
-					.data("slotStart", d.getTime())
-					.data("slotLength", slotLength)
+					.data("slotData", {
+						start : d.getTime(),
+						length : slotLength
+					})
 					.append(
 						$("<div>")
 						.html("&nbsp;")
