@@ -39,18 +39,18 @@ function TimetableView(element, calendar, viewName) {
 	t.cellIsAllDay = cellIsAllDay;
 	t.allDayRow = getAllDayRow;
 	t.allDayBounds = allDayBounds;
-	t.getHoverListener = function() { return hoverListener };
+	t.getHoverListener = function() {return hoverListener};
 	t.colContentLeft = colContentLeft;
 	t.colContentRight = colContentRight;
-	t.getDaySegmentContainer = function() { return daySegmentContainer };
-	t.getSlotSegmentContainer = function() { return slotSegmentContainer };
-	t.getMinMinute = function() { return minMinute };
-	t.getMaxMinute = function() { return maxMinute };
-	t.getBodyContent = function() { return slotContent }; // !!??
-	t.getRowCnt = function() { return 1 };
-	t.getColCnt = function() { return colCnt };
-	t.getColWidth = function() { return colWidth };
-	t.getSlotHeight = function() { return slotHeight };
+	t.getDaySegmentContainer = function() {return daySegmentContainer};
+	t.getSlotSegmentContainer = function() {return slotSegmentContainer};
+	t.getMinMinute = function() {return minMinute};
+	t.getMaxMinute = function() {return maxMinute};
+	t.getBodyContent = function() {return slotContent}; // !!??
+	t.getRowCnt = function() {return 1};
+	t.getColCnt = function() {return colCnt};
+	t.getColWidth = function() {return colWidth};
+	t.getSlotHeight = function() {return slotHeight};
 	t.defaultSelectionEnd = defaultSelectionEnd;
 	t.renderDayOverlay = renderDayOverlay;
 	t.renderSelection = renderSelection;
@@ -227,14 +227,16 @@ function TimetableView(element, calendar, viewName) {
 					.appendTo(slotLayer);
 		
 			s =
-				$("<table style='width:100%' class='fc-timetable-allday' cellspacing='0'>")
-				.append($("<tr>")
-					.append($("<th class='" + headerClass + " fc-timetable-axis'>" + opt('allDayText') + "</th>" + "<td>")
-					.append($("<div class='fc-day-content'><div style='position:relative'/></div>"))
-				)
-				.append($("<th class='" + headerClass + " fc-timetable-gutter'>&nbsp;</th>")));
-				
-			allDayTable = s.appendTo(slotLayer);
+				"<table style='width:100%' class='fc-timetable-allday' cellspacing='0'>" +
+				"<tr>" +
+				"<th class='" + headerClass + " fc-timetable-axis'>" + opt('allDayText') + "</th>" +
+				"<td>" +
+				"<div class='fc-day-content'><div style='position:relative'/></div>" +
+				"</td>" +
+				"<th class='" + headerClass + " fc-timetable-gutter'>&nbsp;</th>" +
+				"</tr>" +
+				"</table>";
+			allDayTable = $(s).appendTo(slotLayer);
 			allDayRow = allDayTable.find('tr');
 			
 			dayBind(allDayRow.find('td'));
@@ -266,9 +268,14 @@ function TimetableView(element, calendar, viewName) {
 			$("<div style='position:absolute;z-index:8;top:0;left:0'/>")
 				.appendTo(slotContent);
 		
+		/*This table has been converted to use jQuery builder code mainly so we 
+		 *can take advantage of jQuery data()
+		 */
 		s =
-			"<table class='fc-timetable-slots' style='width:100%' cellspacing='0'>" +
-			"<tbody>";
+			$("<table class='fc-timetable-slots' style='width:100%' cellspacing='0'>") 
+			 .append($("<tbody>"))
+			 .children().first();
+			 
 		d = zeroDate();
 		maxd = addMinutes(cloneDate(d), maxMinute);
 		addMinutes(d, minMinute);
@@ -276,21 +283,29 @@ function TimetableView(element, calendar, viewName) {
 		for (i=0; d < maxd; i++) {
 			var slotLength = getSlotMinutes(i);
 			minutes = d.getMinutes();
-			s +=
-				"<tr class='fc-slot" + i + ' ' + (!minutes ? '' : 'fc-minor') + "' \n\
-					+ height='"+ getSlotHeight(slotLength, totalMinutes) +"' >" +
-				"<th class='fc-timetable-axis " + headerClass + "'>" +
-				((!slotNormal || !minutes) ? formatDate(d, opt('axisFormat')) : '&nbsp;') +
-				"</th>" +
-				"<td class='" + contentClass + "'>" +
-				"<div style='position:relative'>&nbsp;</div>" +
-				"</td>" +
-				"</tr>";
+			s.append(
+				$("<tr>")
+				.addClass('fc-slot' + i)
+				.addClass(!minutes ? '' : 'fc-minor')
+				.attr("height", getSlotHeight(slotLength, totalMinutes))
+				.data("slot", slotLength)
+				.append(
+					$("<th>")
+					.addClass("fc-timetable-axis")
+					.addClass(headerClass)
+					.html(((!slotNormal || !minutes) ? formatDate(d, opt('axisFormat')) : '&nbsp;'))	
+					)
+				.append(
+					$("<td>")
+					.addClass("contentClass")
+					.append(
+						$("<div>")
+						.html("&nbsp;")
+						.addClass("contentDiv")
+						)));
 			addMinutes(d, slotLength);
 		}
-		s +=
-			"</tbody>" +
-			"</table>";
+		s = s.parent();
 		slotTable = $(s).appendTo(slotContent);
 		slotTableFirstInner = slotTable.find('div:first');
 		
