@@ -388,10 +388,11 @@ function TimetableView(element, calendar, viewName) {
 		var allDayHeight = slotScroller.position().top; // including divider
 		var bodyHeight = height - headHeight;
 		if (!fixedHeight) {
-			bodyHeaight = Math.min( // total body height, including borders
+			bodyHeight = Math.min( // total body height, including borders
 			bodyHeight,   // when scrollbars
 			slotTable.height() + allDayHeight + 1 // when no scrollbars. +1 for bottom border
-		)}
+		)
+		}
 		
 		dayBodyFirstCellStretcher
 			.height(bodyHeight - vsides(dayBodyFirstCell));
