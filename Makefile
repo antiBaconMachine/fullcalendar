@@ -13,16 +13,16 @@ VER_SED = sed s/@VERSION/"${VER}"/
 DATE = $$(git log -1 --pretty=format:%ad)
 DATE_SED = sed s/@DATE/"${DATE}"/
 
-JQ = $$(sed -nE "s/.*JQUERY[ \t]*=[ \t]*[\"'](.*)[\"'].*/\1/p" "${SRC_DIR}/_loader.js")
-JQUI = $$(sed -nE "s/.*JQUERY_UI[ \t]*=[ \t]*[\"'](.*)[\"'].*/\1/p" "${SRC_DIR}/_loader.js")
+JQ = $$(sed -nr "s/.*JQUERY[ \t]*=[ \t]*[\"'](.*)[\"'].*/\1/p" "${SRC_DIR}/_loader.js")
+JQUI = $$(sed -nr "s/.*JQUERY_UI[ \t]*=[ \t]*[\"'](.*)[\"'].*/\1/p" "${SRC_DIR}/_loader.js")
 
 DEMO_FILES = $$(cd ${DEMOS_DIR}; find . -mindepth 1 -maxdepth 1 -type f)
 DEMO_SUBDIRS = $$(cd ${DEMOS_DIR}; find . -mindepth 1 -maxdepth 1 -type d)
 DEMO_RE = (<script[^>]*_loader\.js[^>]*><\/script>|<!--\[\[|\]\]-->)[^<]*
-DEMO_SED = sed -nE '1h;1!H;$${;g;s/${DEMO_RE}//g;p;}'
+DEMO_SED = sed -nr '1h;1!H;$${;g;s/${DEMO_RE}//g;p;}'
 
-JS_SED = sed -nE "s/[ \t]*js\([\"'](.*)[\"']\).*/\1/p"
-CSS_SED = sed -nE "s/[ \t]*css\([\"'](.*)[\"']\).*/\1/p"
+JS_SED = sed -nr "s/[ \t]*js\([\"'](.*)[\"']\).*/\1/p"
+CSS_SED = sed -nr "s/[ \t]*css\([\"'](.*)[\"']\).*/\1/p"
 
 concat_js = \
 	files=$$(cat "$(1)/_loader.js" | ${JS_SED}); \
