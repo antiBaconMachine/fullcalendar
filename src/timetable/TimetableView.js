@@ -288,8 +288,6 @@ function TimetableView(element, calendar, viewName) {
 				.addClass('fc-slot' + i)
 				.addClass(!minutes ? '' : 'fc-minor')
 				.attr("height", getSlotHeight(slotLength, totalMinutes))
-				.data("slotStart", d.getTime())
-				.data("slotLength", slotLength)
 				.append(
 					$("<th>")
 					.addClass("fc-timetable-axis")
@@ -299,6 +297,8 @@ function TimetableView(element, calendar, viewName) {
 				.append(
 					$("<td>")
 					.addClass("contentClass")
+					.data("slotStart", d.getTime())
+					.data("slotLength", slotLength)
 					.append(
 						$("<div>")
 						.html("&nbsp;")
