@@ -338,20 +338,21 @@ function TimetableView(element, calendar, viewName) {
 	}
 	
 	function getSlotCount(begin, end) {
+		var start = cloneDate(begin);
 		var count = 0;
 		var slotPattern = opt('slotPattern');
 		var defaultSlot = opt('slotMinutes');
 		if (slotPattern.length) {
 			for (var i in slotPattern) {
-				addMinutes(begin, slotPattern[i]);
+				addMinutes(start, slotPattern[i]);
 				count++;
-				if (begin >= end) {
+				if (start >= end) {
 					break;
 				}
 			}
 		}
-		while (begin < end) {
-			addMinutes(begin, defaultSlot);
+		while (start < end) {
+			addMinutes(start, defaultSlot);
 			count++;
 		}
 		return count;
@@ -668,10 +669,16 @@ function TimetableView(element, calendar, viewName) {
 		if (time >= addMinutes(cloneDate(day), maxMinute)) {
 			return slotTable.height();
 		}
+		var start = cloneDate(time);
+		start.setHours(0);
+		start.setMinutes(0);
+		start.setSeconds(0);
+		start.setMilliseconds(0);
+		addMinutes(start, minMinute);
 		var slotMinutes = opt('slotMinutes'),
-			minutes = time.getHours()*60 + time.getMinutes() - minMinute,
-			slotI = Math.floor(minutes / slotMinutes),
-			slotTop = slotTopCache[slotI];
+		minutes = time.getHours()*60 + time.getMinutes() - minMinute,
+		slotI = getSlotCount(start,time),
+		slotTop = slotTopCache[slotI];
 		if (slotTop === undefined) {
 			slotTop = slotTopCache[slotI] = slotTable.find('tr:eq(' + slotI + ') td div')[0].offsetTop; //.position().top; // need this optimization???
 		}
