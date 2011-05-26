@@ -281,32 +281,31 @@ function TimetableView(element, calendar, viewName) {
 		addMinutes(d, minMinute);
 		var totalMinutes = getTotalMinutes(cloneDate(d), maxd);
 		for (i=0; d < maxd; i++) {
-			var slotLength = getSlotMinutes(i);
+			var slotData = getSlotData(i);
+			slotData.start = d.getTime();
+			var slotLabel = slotData.title || ((!slotNormal || !minutes) ? formatDate(d, opt('axisFormat')) : '&nbsp;');
 			minutes = d.getMinutes();
 			s.append(
 				$("<tr>")
 				.addClass('fc-slot' + i)
 				.addClass(!minutes ? '' : 'fc-minor')
-				.attr("height", getSlotHeight(slotLength, totalMinutes))
+				.attr("height", getSlotHeight(slotData.length, totalMinutes))
 				.append(
 					$("<th>")
 					.addClass("fc-timetable-axis")
 					.addClass(headerClass)
-					.html(((!slotNormal || !minutes) ? formatDate(d, opt('axisFormat')) : '&nbsp;'))	
+					.html(slotLabel)	
 					)
 				.append(
 					$("<td>")
 					.addClass(contentClass)
-					.data("slotData", {
-						start : d.getTime(),
-						length : slotLength
-					})
+					.data("slotData", slotData)
 					.append(
 						$("<div>")
 						.html("&nbsp;")
 						.addClass("contentDiv")
 						)));
-			addMinutes(d, slotLength);
+			addMinutes(d, slotData.length);
 		}
 		s = s.parent();
 		slotTable = $(s).appendTo(slotContent);
@@ -317,11 +316,17 @@ function TimetableView(element, calendar, viewName) {
 		axisFirstCells = axisFirstCells.add(slotTable.find('th:first'));
 	}
 	
-	function getSlotMinutes(i) {
+	function getSlotData(i) {
 		var slotPattern = opt('slotPattern');
 		var ret = opt('slotMinutes');
 		if (slotPattern) {
 			ret = slotPattern[i] || ret;
+		}
+		if (typeof ret !== "object") {
+			ret = {
+				length : ret,
+				title : null
+			}
 		}
 		return ret;
 	}
