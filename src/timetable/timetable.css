@@ -6,7 +6,7 @@
 {
 	height: 100%;
 }
-#calendar .slotScroller .scrollinner {
+#calendar .slotScroller .scrollInner {
 	overflow-x: hidden;
 	overflow-y: auto;
 	height:	3000px;
