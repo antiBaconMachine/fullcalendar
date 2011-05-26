@@ -121,6 +121,8 @@ function TimetableView(element, calendar, viewName) {
 	var rtl, dis, dit;  // day index sign / translate
 	var minMinute, maxMinute;
 	var colFormat;
+	
+	var slotPattern = opt('slotPattern');
 
 	/* Rendering
 	-----------------------------------------------------------------------------*/
@@ -168,7 +170,7 @@ function TimetableView(element, calendar, viewName) {
 		var d;
 		var maxd;
 		var minutes;
-		var slotNormal = opt('slotPattern') != null ? false :  opt('slotMinutes') % 15 == 0;
+		var slotNormal = slotPattern != null ? false :  opt('slotMinutes') % 15 == 0;
 		
 		s =
 			"<table style='width:100%' class='fc-timetable-days fc-border-separate' cellspacing='0'>" +
@@ -320,24 +322,26 @@ function TimetableView(element, calendar, viewName) {
 	}
 	
 	function getSlotData(i) {
-		var slotPattern = opt('slotPattern');
 		var ret = opt('slotMinutes');
 		if (slotPattern) {
 			ret = slotPattern[i] || ret;
 		}
-		return wrapSlotData(ret);
+		return wrapSlotData(ret, slotPattern, i);
 	}
 	
-	/*Slot patterns can be passed as simple int lengths or complex objects. 
-	 *We wrap ints into objects here for consistency
-	 *
-	 *TODO: cache this result
+	/*Slot patterns can be passed as simple int lengths or complex objects. If
+	 *the pattern is not long enough it is padded with default length slots.
+	 *We wrap all possibilities into objects here for consistency
 	 */
-	function wrapSlotData(d) {
+	function wrapSlotData(d, slotPattern, i) {
 		if (typeof d !== "object") {
 			d = {
 				length : d,
 				title : null
+			}
+			if (slotPattern && typeof i !== "undefined") {
+				console.info("caching wrapped data %i %i %o",i,slotPattern[i],d);
+				slotPattern[i] = d;
 			}
 		}
 		return d;
@@ -357,7 +361,6 @@ function TimetableView(element, calendar, viewName) {
 	function getSlotCount(begin, end) {
 		var start = cloneDate(begin);
 		var count = 0;
-		var slotPattern = opt('slotPattern');
 		var defaultSlot = opt('slotMinutes');
 		if (slotPattern.length) {
 			for (var i in slotPattern) {
