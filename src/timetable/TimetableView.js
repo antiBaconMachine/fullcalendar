@@ -263,7 +263,7 @@ function TimetableView(element, calendar, viewName) {
 				.appendTo(slotLayer);
 				
 		slotContent =
-			$("<div style='position:relative;width:100%;overflow:hidden'/>")
+			$("<div class='scrollInner' style='position:relative;width:100%;'/>")
 				.appendTo(slotScroller);
 				
 		slotSegmentContainer =

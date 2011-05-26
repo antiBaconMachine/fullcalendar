@@ -6,6 +6,10 @@
 {
 	height: 100%;
 }
+#calendar .scrollinner {
+	overflow-x: hidden;
+	overflow-y: auto;
+}
 
 fc-widget-content .contentDiv {
 	position: relative;
