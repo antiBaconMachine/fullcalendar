@@ -340,7 +340,6 @@ function TimetableView(element, calendar, viewName) {
 				title : null
 			}
 			if (slotPattern && typeof i !== "undefined") {
-				console.info("caching wrapped data %i %i %o",i,slotPattern[i],d);
 				slotPattern[i] = d;
 			}
 		}
