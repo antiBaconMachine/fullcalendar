@@ -678,12 +678,21 @@ function TimetableView(element, calendar, viewName) {
 		var slotMinutes = opt('slotMinutes'),
 		minutes = time.getHours()*60 + time.getMinutes() - minMinute,
 		slotI = getSlotCount(start,time),
-		slotTop = slotTopCache[slotI];
-		if (slotTop === undefined) {
-			slotTop = slotTopCache[slotI] = slotTable.find('tr:eq(' + slotI + ') td div')[0].offsetTop; //.position().top; // need this optimization???
+		cached = slotTopCache[slotI];
+		
+		//TODO: is this extended cache actually useful? right now it's not
+		if (cached === undefined) {
+			var row = slotTable.find('tr:eq(' + slotI + ')');
+			var div = row.find("td div");
+			cached = slotTopCache[slotI] = {
+				row : row,
+				div : div,
+				slotTop : div.position().top
+			};
 		}
+		
 		return Math.max(0, Math.round(
-			slotTop - 1 + slotHeight * ((minutes % slotMinutes) / slotMinutes)
+			cached.slotTop
 		));
 	}
 	
