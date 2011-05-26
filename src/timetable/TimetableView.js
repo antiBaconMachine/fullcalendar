@@ -281,8 +281,11 @@ function TimetableView(element, calendar, viewName) {
 		addMinutes(d, minMinute);
 		var totalMinutes = getTotalMinutes(cloneDate(d), maxd);
 		for (i=0; d < maxd; i++) {
-			var slotData = getSlotData(i);
-			slotData.start = d.getTime();
+			var slotData = $.extend(getSlotData(i),
+				{
+					start : d.getTime(),
+					slotNo : i
+				});
 			var slotLabel = slotData.title || ((!slotNormal || !minutes) ? formatDate(d, opt('axisFormat')) : '&nbsp;');
 			minutes = d.getMinutes();
 			s.append(
@@ -322,13 +325,22 @@ function TimetableView(element, calendar, viewName) {
 		if (slotPattern) {
 			ret = slotPattern[i] || ret;
 		}
-		if (typeof ret !== "object") {
-			ret = {
-				length : ret,
+		return wrapSlotData(ret);
+	}
+	
+	/*Slot patterns can be passed as simple int lengths or complex objects. 
+	 *We wrap ints into objects here for consistency
+	 *
+	 *TODO: cache this result
+	 */
+	function wrapSlotData(d) {
+		if (typeof d !== "object") {
+			d = {
+				length : d,
 				title : null
 			}
 		}
-		return ret;
+		return d;
 	}
 	
 	function getSlotHeight(slotLength, totalMinutes) {
@@ -349,7 +361,8 @@ function TimetableView(element, calendar, viewName) {
 		var defaultSlot = opt('slotMinutes');
 		if (slotPattern.length) {
 			for (var i in slotPattern) {
-				addMinutes(start, slotPattern[i]);
+				var slotData = wrapSlotData(slotPattern[i]);
+				addMinutes(start, slotData.length);
 				count++;
 				if (start >= end) {
 					break;
