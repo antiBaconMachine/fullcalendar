@@ -58,6 +58,7 @@ js('agenda/AgendaView.js');
 js('agenda/AgendaEventRenderer.js');
 
 js('timetable/TimetableWeekView.js');
+js('timetable/TimetableDayView.js');
 js('timetable/TimetableView.js');
 js('timetable/TimetableEventRenderer.js');
 
