@@ -282,6 +282,7 @@ function TimetableView(element, calendar, viewName) {
 		maxd = addMinutes(cloneDate(d), maxMinute);
 		addMinutes(d, minMinute);
 		var totalMinutes = getTotalMinutes(cloneDate(d), maxd);
+		slotCnt = 0;
 		for (i=0; d < maxd; i++) {
 			var slotData = $.extend(getSlotData(i),
 				{
@@ -311,6 +312,7 @@ function TimetableView(element, calendar, viewName) {
 						.addClass("contentDiv")
 						)));
 			addMinutes(d, slotData.length);
+			slotCnt++;
 		}
 		s = s.parent();
 		slotTable = $(s).appendTo(slotContent);
@@ -357,6 +359,7 @@ function TimetableView(element, calendar, viewName) {
 		return parseInt((end.getTime() - begin.getTime()) / (1000 * 60));
 	}
 	
+	//count slots between start and end time
 	function getSlotCount(begin, end) {
 		var start = cloneDate(begin);
 		var count = 0;
