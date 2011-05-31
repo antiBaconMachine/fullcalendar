@@ -50,7 +50,7 @@ function TimetableView(element, calendar, viewName) {
 	t.getRowCnt = function() {return 1};
 	t.getColCnt = function() {return colCnt};
 	t.getColWidth = function() {return colWidth};
-	t.getSlotHeight = function() {return slotHeight};
+	t.getSlotHeight = getPixelHeight;
 	t.defaultSelectionEnd = defaultSelectionEnd;
 	t.renderDayOverlay = renderDayOverlay;
 	t.renderSelection = renderSelection;
@@ -58,6 +58,7 @@ function TimetableView(element, calendar, viewName) {
 	t.reportDayClick = reportDayClick; // selection mousedown hack
 	t.dragStart = dragStart;
 	t.dragStop = dragStop;
+	t.getSlotData = getSlotData;
 	
 	
 	// imports
@@ -295,7 +296,7 @@ function TimetableView(element, calendar, viewName) {
 				$("<tr>")
 				.addClass('fc-slot' + i)
 				.addClass(!minutes ? '' : 'fc-minor')
-				.attr("height", getSlotHeight(slotData.length, totalMinutes))
+				.attr("height", getPercentageHeight(slotData.length, totalMinutes))
 				.append(
 					$("<th>")
 					.addClass("fc-timetable-axis")
@@ -331,6 +332,13 @@ function TimetableView(element, calendar, viewName) {
 		return wrapSlotData(ret, slotPattern, i);
 	}
 	
+	function getPixelHeight(i) {
+		if (typeof i === "undefined") {
+			return slotHeight;
+		} 
+		return $("#calendar .fc-slot"+i).height();
+	}
+	
 	/*Slot patterns can be passed as simple int lengths or complex objects. If
 	 *the pattern is not long enough it is padded with default length slots.
 	 *We wrap all possibilities into objects here for consistency
@@ -348,7 +356,7 @@ function TimetableView(element, calendar, viewName) {
 		return d;
 	}
 	
-	function getSlotHeight(slotLength, totalMinutes) {
+	function getPercentageHeight(slotLength, totalMinutes) {
 		if (opt('varriableSlotHeights')) {
 			return slotLength / totalMinutes * 100 + "%";
 		}
@@ -619,7 +627,7 @@ function TimetableView(element, calendar, viewName) {
 		
 		var currentTop = slotTableTop;
 		for (var i=0; i<slotCnt; i++) {
-			var nextTop = currentTop + $("#calendar .fc-slot"+i).height();
+			var nextTop = currentTop + getPixelHeight(i);
 			rows.push([
 				constrain(currentTop),
 				constrain(nextTop)
