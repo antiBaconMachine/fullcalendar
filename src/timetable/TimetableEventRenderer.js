@@ -502,7 +502,7 @@ function TimetableEventRenderer() {
 			},
 			drag: function(ev, ui) {
 				minuteDelta = Math.round((ui.position.top - origPosition.top) / getSlotHeight()) * t.getSlotData( (function(){
-					console.info("%o %o",ev, ui);
+					//console.info("%o %o",ev, ui);
 				} () ) );
 				if (minuteDelta != prevMinuteDelta) {
 					if (!allDay) {
