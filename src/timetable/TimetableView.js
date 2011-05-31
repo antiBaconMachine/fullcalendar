@@ -50,7 +50,7 @@ function TimetableView(element, calendar, viewName) {
 	t.getRowCnt = function() {return 1};
 	t.getColCnt = function() {return colCnt};
 	t.getColWidth = function() {return colWidth};
-	t.getSlotHeight = function() {return slotHeight};
+	t.getSlotHeight = getPixelHeight;
 	t.defaultSelectionEnd = defaultSelectionEnd;
 	t.renderDayOverlay = renderDayOverlay;
 	t.renderSelection = renderSelection;
@@ -58,6 +58,7 @@ function TimetableView(element, calendar, viewName) {
 	t.reportDayClick = reportDayClick; // selection mousedown hack
 	t.dragStart = dragStart;
 	t.dragStop = dragStop;
+	t.getSlotData = getSlotData;
 	
 	
 	// imports
@@ -282,6 +283,7 @@ function TimetableView(element, calendar, viewName) {
 		maxd = addMinutes(cloneDate(d), maxMinute);
 		addMinutes(d, minMinute);
 		var totalMinutes = getTotalMinutes(cloneDate(d), maxd);
+		slotCnt = 0;
 		for (i=0; d < maxd; i++) {
 			var slotData = $.extend(getSlotData(i),
 				{
@@ -294,7 +296,7 @@ function TimetableView(element, calendar, viewName) {
 				$("<tr>")
 				.addClass('fc-slot' + i)
 				.addClass(!minutes ? '' : 'fc-minor')
-				.attr("height", getSlotHeight(slotData.length, totalMinutes))
+				.attr("height", getPercentageHeight(slotData.length, totalMinutes))
 				.append(
 					$("<th>")
 					.addClass("fc-timetable-axis")
@@ -311,6 +313,7 @@ function TimetableView(element, calendar, viewName) {
 						.addClass("contentDiv")
 						)));
 			addMinutes(d, slotData.length);
+			slotCnt++;
 		}
 		s = s.parent();
 		slotTable = $(s).appendTo(slotContent);
@@ -327,6 +330,13 @@ function TimetableView(element, calendar, viewName) {
 			ret = slotPattern[i] || ret;
 		}
 		return wrapSlotData(ret, slotPattern, i);
+	}
+	
+	function getPixelHeight(i) {
+		if (typeof i === "undefined") {
+			return slotHeight;
+		} 
+		return $("#calendar .fc-slot"+i).height();
 	}
 	
 	/*Slot patterns can be passed as simple int lengths or complex objects. If
@@ -346,7 +356,7 @@ function TimetableView(element, calendar, viewName) {
 		return d;
 	}
 	
-	function getSlotHeight(slotLength, totalMinutes) {
+	function getPercentageHeight(slotLength, totalMinutes) {
 		if (opt('varriableSlotHeights')) {
 			return slotLength / totalMinutes * 100 + "%";
 		}
@@ -357,6 +367,7 @@ function TimetableView(element, calendar, viewName) {
 		return parseInt((end.getTime() - begin.getTime()) / (1000 * 60));
 	}
 	
+	//count slots between start and end time
 	function getSlotCount(begin, end) {
 		var start = cloneDate(begin);
 		var count = 0;
@@ -607,17 +618,21 @@ function TimetableView(element, calendar, viewName) {
 			n = e.offset().top;
 			rows[0] = [n, n+e.outerHeight()];
 		}
-		var slotTableTop = slotContent.offset().top;
-		var slotScrollerTop = slotScroller.offset().top;
+		var slotTableTop = slotScroller.offset().top;
+		var slotScrollerTop = slotTableTop;
 		var slotScrollerBottom = slotScrollerTop + slotScroller.outerHeight();
 		function constrain(n) {
 			return Math.max(slotScrollerTop, Math.min(slotScrollerBottom, n));
 		}
+		
+		var currentTop = slotTableTop;
 		for (var i=0; i<slotCnt; i++) {
+			var nextTop = currentTop + getPixelHeight(i);
 			rows.push([
-				constrain(slotTableTop + slotHeight*i),
-				constrain(slotTableTop + slotHeight*(i+1))
+				constrain(currentTop),
+				constrain(nextTop)
 			]);
+			currentTop = nextTop;
 		}
 	});
 	
