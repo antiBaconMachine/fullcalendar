@@ -610,17 +610,21 @@ function TimetableView(element, calendar, viewName) {
 			n = e.offset().top;
 			rows[0] = [n, n+e.outerHeight()];
 		}
-		var slotTableTop = slotContent.offset().top;
-		var slotScrollerTop = slotScroller.offset().top;
+		var slotTableTop = slotScroller.offset().top;
+		var slotScrollerTop = slotTableTop;
 		var slotScrollerBottom = slotScrollerTop + slotScroller.outerHeight();
 		function constrain(n) {
 			return Math.max(slotScrollerTop, Math.min(slotScrollerBottom, n));
 		}
+		
+		var currentTop = slotTableTop;
 		for (var i=0; i<slotCnt; i++) {
+			var nextTop = currentTop + $("#calendar .fc-slot"+i).height();
 			rows.push([
-				constrain(slotTableTop + slotHeight*i),
-				constrain(slotTableTop + slotHeight*(i+1))
+				constrain(currentTop),
+				constrain(nextTop)
 			]);
+			currentTop = nextTop;
 		}
 	});
 	
