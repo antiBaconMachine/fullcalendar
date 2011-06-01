@@ -641,9 +641,7 @@ function TimetableView(element, calendar, viewName) {
 		
 		//Hack an extra function in to do reverse lookups based on a position
 		coordinateGrid.getSlotForPosition = function(y) {
-			if (allDayRow) {
-				y += rows[1][0];
-			}
+			y-=slotTableTop;
 		  var slot = null;
 			var len = rows.length;
 			var row;
