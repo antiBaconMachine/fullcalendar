@@ -501,9 +501,10 @@ function TimetableEventRenderer() {
 				}, ev, 'drag');
 			},
 			drag: function(ev, ui) {
-				minuteDelta = Math.round((ui.position.top - origPosition.top) / getSlotHeight()) * t.getSlotData( (function(){
-					//console.info("%o %o",ev, ui);
-				} () ) );
+				var top = ui.position.top;
+				var slot = t.getSlotForPosition(top);
+				minuteDelta = Math.round((ui.position.top - origPosition.top) / getSlotHeight()) * t.getSlotData(slot).length;
+				console.info("drag to slot %i, delta %i %o %o", slot, minuteDelta, ev, ui);
 				if (minuteDelta != prevMinuteDelta) {
 					if (!allDay) {
 						updateTimeText(minuteDelta);

@@ -59,6 +59,9 @@ function TimetableView(element, calendar, viewName) {
 	t.dragStart = dragStart;
 	t.dragStop = dragStop;
 	t.getSlotData = getSlotData;
+	t.getSlotForPosition = function(y){
+		return coordinateGrid.getSlotForPosition(y);
+	};
 	
 	
 	// imports
@@ -620,7 +623,7 @@ function TimetableView(element, calendar, viewName) {
 		}
 		var slotTableTop = slotScroller.offset().top;
 		var slotScrollerTop = slotTableTop;
-		var slotScrollerBottom = slotScrollerTop + slotScroller.outerHeight();
+		var slotScrollerBottom = slotScrollerTop + slotContent.outerHeight();
 		function constrain(n) {
 			return Math.max(slotScrollerTop, Math.min(slotScrollerBottom, n));
 		}
@@ -628,11 +631,26 @@ function TimetableView(element, calendar, viewName) {
 		var currentTop = slotTableTop;
 		for (var i=0; i<slotCnt; i++) {
 			var nextTop = currentTop + getPixelHeight(i);
-			rows.push([
+			var row = [
 				constrain(currentTop),
 				constrain(nextTop)
-			]);
+			];
+			rows.push(row);
 			currentTop = nextTop;
+		}
+		
+		//Hack an extra function in to do reverse lookups based on a position
+		coordinateGrid.getSlotForPosition = function(y) {
+		  var slot = null;
+			var len = rows.length;
+			for (var i=0; i<len; i++) {
+				var row = rows[i];
+				if (y >= row[0] && y < row[1] ) {
+					slot = i;
+					break;
+				}
+			}
+			return slot;
 		}
 	});
 	
