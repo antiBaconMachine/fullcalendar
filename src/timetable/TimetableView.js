@@ -304,7 +304,7 @@ function TimetableView(element, calendar, viewName) {
 					$("<th>")
 					.addClass("fc-timetable-axis")
 					.addClass(headerClass)
-					.html(slotLabel)	
+					.html(slotCnt + ": " + formatDate(d, opt('axisFormat')) + " " + slotLabel)	
 					)
 				.append(
 					$("<td>")
@@ -621,7 +621,7 @@ function TimetableView(element, calendar, viewName) {
 			n = e.offset().top;
 			rows[0] = [n, n+e.outerHeight()];
 		}
-		var slotTableTop = slotScroller.offset().top;
+		var slotTableTop = slotScroller.position().top;
 		var slotScrollerTop = slotTableTop;
 		var slotScrollerBottom = slotScrollerTop + slotContent.outerHeight();
 		function constrain(n) {
@@ -641,16 +641,27 @@ function TimetableView(element, calendar, viewName) {
 		
 		//Hack an extra function in to do reverse lookups based on a position
 		coordinateGrid.getSlotForPosition = function(y) {
+			if (allDayRow) {
+				y += rows[1][0];
+			}
 		  var slot = null;
 			var len = rows.length;
+			var row;
 			for (var i=0; i<len; i++) {
-				var row = rows[i];
+				row = rows[i];
 				if (y >= row[0] && y < row[1] ) {
 					slot = i;
 					break;
 				}
 			}
-			return slot;
+			if (slot) {
+				return $.extend(getSlotData(slot), {
+					slotNo : slot,
+					row : row
+				});
+			} else {
+				return slot;
+			}
 		}
 	});
 	

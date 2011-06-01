@@ -464,10 +464,11 @@ function TimetableEventRenderer() {
 		var colCnt = getColCnt();
 		var colWidth = getColWidth();
 		var slotHeight = getSlotHeight();
+		var slot;
 		eventElement.draggable({
 			zIndex: 9,
 			scroll: false,
-			grid: [colWidth, slotHeight],
+			grid: [colWidth, 1],
 			axis: colCnt==1 ? 'y' : false,
 			opacity: opt('dragOpacity'),
 			revertDuration: opt('dragRevertDuration'),
@@ -499,18 +500,35 @@ function TimetableEventRenderer() {
 						}
 					}
 				}, ev, 'drag');
+				slot = t.getSlotForPosition(getMidpoint(ui.position.top, ui.helper.height()));
 			},
 			drag: function(ev, ui) {
-				var top = ui.position.top;
-				var slot = t.getSlotForPosition(top);
-				minuteDelta = Math.round((ui.position.top - origPosition.top) / getSlotHeight()) * t.getSlotData(slot).length;
-				console.info("drag to slot %i, delta %i %o %o", slot, minuteDelta, ev, ui);
-				if (minuteDelta != prevMinuteDelta) {
+				var newSlot = t.getSlotForPosition(getMidpoint(ui.position.top, ui.helper.height()));
+				//minuteDelta = Math.round((ui.position.top - origPosition.top) / getSlotHeight()) * t.getSlotData(slot).length;
+				//console.info(ui.position.top, origPosition.top, getSlotHeight(), t.getSlotData(slot.index).length, slot, minuteDelta);
+				
+				if (slot.slotNo != newSlot.slotNo) {
+					if (!allDay) {
+						if (newSlot.slotNo > slot.slotNo) {
+							minuteDelta += newSlot.length;
+						} else {
+							minuteDelta -= newSlot.length;
+						}
+						updateTimeText(minuteDelta, newSlot.length);
+					}
+					console.info("drag to slot %i %o, delta %i %o %o", slot.slotNo, slot, minuteDelta, ev, ui);
+					slot = newSlot;
+					ui.helper
+						.css("top", slot.row[0])
+						.css("height", slot.row[1] - slot.row[0]);
+				}
+				
+				/*if (minuteDelta != prevMinuteDelta) {
 					if (!allDay) {
 						updateTimeText(minuteDelta);
 					}
 					prevMinuteDelta = minuteDelta;
-				}
+				}*/
 			},
 			stop: function(ev, ui) {
 				var cell = hoverListener.stop();
@@ -529,11 +547,17 @@ function TimetableEventRenderer() {
 				}
 			}
 		});
-		function updateTimeText(minuteDelta) {
-			var newStart = addMinutes(cloneDate(event.start), minuteDelta);
+		
+		function getMidpoint(top, height) {
+			return top + (height / 2);
+		}
+		function updateTimeText(startMinuteDelta, length) {
+			var newStart = addMinutes(cloneDate(event.start), startMinuteDelta);
 			var newEnd;
-			if (event.end) {
-				newEnd = addMinutes(cloneDate(event.end), minuteDelta);
+			if (length) {
+				newEnd = addMinutes(cloneDate(newStart), length);
+			} else if (event.end) {
+				newEnd = addMinutes(cloneDate(event.end), startMinuteDelta);
 			}
 			timeElement.text(formatDates(newStart, newEnd, opt('timeFormat')));
 		}
