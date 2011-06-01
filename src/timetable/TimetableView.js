@@ -59,6 +59,9 @@ function TimetableView(element, calendar, viewName) {
 	t.dragStart = dragStart;
 	t.dragStop = dragStop;
 	t.getSlotData = getSlotData;
+	t.getSlotForPosition = function(y){
+		return coordinateGrid.getSlotForPosition(y);
+	};
 	
 	
 	// imports
@@ -301,7 +304,7 @@ function TimetableView(element, calendar, viewName) {
 					$("<th>")
 					.addClass("fc-timetable-axis")
 					.addClass(headerClass)
-					.html(slotLabel)	
+					.html(slotCnt + ": " + formatDate(d, opt('axisFormat')) + " " + slotLabel)	
 					)
 				.append(
 					$("<td>")
@@ -618,9 +621,9 @@ function TimetableView(element, calendar, viewName) {
 			n = e.offset().top;
 			rows[0] = [n, n+e.outerHeight()];
 		}
-		var slotTableTop = slotScroller.offset().top;
+		var slotTableTop = slotScroller.position().top;
 		var slotScrollerTop = slotTableTop;
-		var slotScrollerBottom = slotScrollerTop + slotScroller.outerHeight();
+		var slotScrollerBottom = slotScrollerTop + slotContent.outerHeight();
 		function constrain(n) {
 			return Math.max(slotScrollerTop, Math.min(slotScrollerBottom, n));
 		}
@@ -628,11 +631,35 @@ function TimetableView(element, calendar, viewName) {
 		var currentTop = slotTableTop;
 		for (var i=0; i<slotCnt; i++) {
 			var nextTop = currentTop + getPixelHeight(i);
-			rows.push([
+			var row = [
 				constrain(currentTop),
 				constrain(nextTop)
-			]);
+			];
+			rows.push(row);
 			currentTop = nextTop;
+		}
+		
+		//Hack an extra function in to do reverse lookups based on a position
+		coordinateGrid.getSlotForPosition = function(y) {
+			y-=slotTableTop;
+		  var slot = null;
+			var len = rows.length;
+			var row;
+			for (var i=0; i<len; i++) {
+				row = rows[i];
+				if (y >= row[0] && y < row[1] ) {
+					slot = i;
+					break;
+				}
+			}
+			if (slot) {
+				return $.extend(getSlotData(slot), {
+					slotNo : slot,
+					row : row
+				});
+			} else {
+				return slot;
+			}
 		}
 	});
 	
