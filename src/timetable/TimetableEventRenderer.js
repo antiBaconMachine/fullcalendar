@@ -501,14 +501,12 @@ function TimetableEventRenderer() {
 						}
 					}
 				}, ev, 'drag');
-				slot = t.getSlotForPosition(getReferencePoint(ui.position.top, ui.helper.height()));
+				slot = t.getCoordinateGrid().getSlotForPosition(getReferencePoint(ui.position.top, ui.helper.height()));
 			},
 			drag: function(ev, ui) {
-				newSlot = t.getSlotForPosition(getReferencePoint(ui.position.top, ui.helper.height()));
+				newSlot = t.getCoordinateGrid().getSlotForPosition(getReferencePoint(ui.position.top, ui.helper.height()));
 				
 				$("tr").css("background-color","transparent").filter(".fc-slot"+newSlot.slotNo).css("background-color", "red");
-				//minuteDelta = Math.round((ui.position.top - origPosition.top) / getSlotHeight()) * t.getSlotData(slot).length;
-				//console.info(ui.position.top, origPosition.top, getSlotHeight(), t.getSlotData(slot.index).length, slot, minuteDelta);
 				
 				if (slot.slotNo != newSlot.slotNo) {
 					if (!allDay) {
@@ -580,36 +578,44 @@ function TimetableEventRenderer() {
 	function resizableSlotEvent(event, eventElement, timeElement) {
 		var slotDelta, prevSlotDelta;
 		var slotHeight = getSlotHeight();
+		var slot;
 		eventElement.resizable({
 			handles: {
 				s: 'div.ui-resizable-s'
 			},
 			grid: slotHeight,
 			start: function(ev, ui) {
+				t.getCoordinateGrid().build();
 				slotDelta = prevSlotDelta = 0;
 				hideEvents(event, eventElement);
 				eventElement.css('z-index', 9);
 				trigger('eventResizeStart', this, event, ev, ui);
+				slot = t.getCoordinateGrid().getSlotForPosition(ui.position.top + ui.helper.height() - 10);
 			},
 			resize: function(ev, ui) {
 				// don't rely on ui.size.height, doesn't take grid into account
-				slotDelta = Math.round((Math.max(slotHeight, eventElement.height()) - ui.originalSize.height) / slotHeight);
-				if (slotDelta != prevSlotDelta) {
+				var newSlot = t.getCoordinateGrid().getSlotForPosition(ui.position.top + ui.helper.height() - 10);
+				if (slot.slotNo != newSlot.slotNo) {
+					console.info(slot, newSlot);
+					console.info(event.start, event.end);
+					
+					event.end = addMinutes(cloneDate(event.start), slot.length + (slotStart.getHours()* 60) + slotStart.getMinutes());
+					console.info(event.end);
 					timeElement.text(
 						formatDates(
 							event.start,
-							(!slotDelta && !event.end) ? null : // no change, so don't display time range
-								addMinutes(eventEnd(event), opt('slotMinutes')*slotDelta),
+							event.end,
 							opt('timeFormat')
 						)
 					);
-					prevSlotDelta = slotDelta;
+					ui.helper.css("height", newSlot.row[1]);	
+					
 				}
 			},
 			stop: function(ev, ui) {
 				trigger('eventResizeStop', this, event, ev, ui);
 				if (slotDelta) {
-					eventResize(this, event, 0, opt('slotMinutes')*slotDelta, ev, ui);
+					//eventResize(this, event, 0, opt('slotMinutes')*slotDelta, ev, ui);
 				}else{
 					eventElement.css('z-index', 8);
 					showEvents(event, eventElement);

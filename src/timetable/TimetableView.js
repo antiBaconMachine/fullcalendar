@@ -59,10 +59,12 @@ function TimetableView(element, calendar, viewName) {
 	t.dragStart = dragStart;
 	t.dragStop = dragStop;
 	t.getSlotData = getSlotData;
-	window.getSlotData = getSlotData;
-	t.getSlotForPosition = function(y){
-		return coordinateGrid.getSlotForPosition(y);
+	t.getCoordinateGrid = function(){
+		return coordinateGrid;
 	};
+	
+	//TODO remove debugging feature
+	window.getSlotData = getSlotData;
 	
 	
 	// imports
