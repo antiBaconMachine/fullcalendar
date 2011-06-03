@@ -593,18 +593,16 @@ function TimetableEventRenderer() {
 				slot = t.getCoordinateGrid().getSlotForPosition(ui.position.top + ui.helper.height() - 10);
 			},
 			resize: function(ev, ui) {
-				// don't rely on ui.size.height, doesn't take grid into account
 				var newSlot = t.getCoordinateGrid().getSlotForPosition(ui.position.top + ui.helper.height() - 10);
 				if (slot.slotNo != newSlot.slotNo) {
-					console.info(slot, newSlot);
-					console.info(event.start, event.end);
+					
+					//TODO: fix zeroDate to actually be zero
 					var start = new Date(newSlot.start);
 					event.end = clearTime(cloneDate(event.start));
 					event.end.setHours(start.getHours());
 					event.end.setMinutes(start.getMinutes());
 					addMinutes(event.end, newSlot.length);
 					
-					console.info(event.end);
 					timeElement.text(
 						formatDates(
 							event.start,
