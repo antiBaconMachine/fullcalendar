@@ -284,7 +284,17 @@ function TimetableView(element, calendar, viewName) {
 			$("<table class='fc-timetable-slots' style='width:100%' cellspacing='0'>") 
 			 .append($("<tbody>"))
 			 .children().first();
-			 
+		
+		//Hack to allow different slot patterns depending on day
+		var pattern = slotPattern.defaultPattern;
+		if (viewName === "timetableDay") {
+			var day = t.start.getDay();
+			if (day === 6 || day === 0) {
+				pattern = slotPattern.weekend || pattern;
+			}
+		}
+		slotPattern = pattern;
+		
 		d = zeroDate();
 		maxd = addMinutes(cloneDate(d), maxMinute);
 		addMinutes(d, minMinute);

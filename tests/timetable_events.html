@@ -17,10 +17,11 @@
 				right: 'timetableWeek,  timetableDay, agendaWeek'
 			},
 			editable: true,
-			weekends : false,
+			weekends : true,
 			slotMinutes : 60,
 			slotPattern : {
-				timetable : [240,240,30,20,
+				timetable : {
+					defaultPattern : [240,240,30,20,
 					{length : 40, 
 						title : "Period 1"
 					},{length : 40, 
@@ -41,7 +42,28 @@
 						title : "Period 7"
 					},{length : 40, 
 						title : "Period 8"
-					}]
+					}],
+				weekend : [
+					480,
+					{
+						length : 240,
+						title : "Morning"
+					},
+					{
+						length : 300,
+						title : "Afternoon"
+					},
+					{
+						length : 120,
+						title : "Tea time"
+					},
+					{
+						length : 240,
+						title : "Evening"
+					}
+					
+				]
+				}
 			},
 			varriableSlotHeights : true,
 			events: 'timetable_events.js'
