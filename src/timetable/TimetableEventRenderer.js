@@ -466,6 +466,7 @@ function TimetableEventRenderer() {
 		var slotHeight = getSlotHeight();
 		var slot;
 		var newSlot;
+		var endSlot;
 		var slotRange=0;
 		var col;
 		var newCol;
@@ -505,7 +506,7 @@ function TimetableEventRenderer() {
 					}
 				}, ev, 'drag');
 				slot = t.getCoordinateGrid().getSlotForPosition(getYReferencePoint(ui));
-				var endSlot = t.getCoordinateGrid().getSlotForPosition((ui.position.top + ui.helper.height())-1);
+				endSlot = t.getCoordinateGrid().getSlotForPosition((ui.position.top + ui.helper.height())-1);
 				if (endSlot) {
 					slotRange = endSlot.slotNo - slot.slotNo;
 				}
@@ -513,12 +514,14 @@ function TimetableEventRenderer() {
 			},
 			drag: function(ev, ui) {
 				newSlot = t.getCoordinateGrid().getSlotForPosition(getYReferencePoint(ui));
+				endSlot = slotRange ? t.getCoordinateGrid().getSlotForIndex(newSlot.slotNo + slotRange) : newSlot;
+				
 				$(".dragOver").removeClass("dragOver");
 				$(".fc-slot"+newSlot.slotNo).addClass("dragOver");
 				
 				if (slot.slotNo != newSlot.slotNo) {
 					if (!allDay) {
-						updateTimeText(newSlot.start, newSlot.length);
+						updateTimeText(newSlot, endSlot);
 					}
 					moveEvent(ev,ui,newSlot, slotRange);
 				}
@@ -540,7 +543,6 @@ function TimetableEventRenderer() {
 					resetElement();
 					eventElement.css('filter', ''); // clear IE opacity side-effects
 					eventElement.css(origPosition); // sometimes fast drags make event revert to wrong position
-					//updateTimeText(0);
 					showEvents(event, eventElement);
 				}
 			}
@@ -568,11 +570,17 @@ function TimetableEventRenderer() {
 						.css("top", slot.row[0])
 						.css("height", endSlot.row[1] - slot.row[0]);
 		}
-		function updateTimeText(start, length) {
-			var newStart = new Date(start);
+		function updateTimeText(newSlot, endSlot) {
+			var newStart = new Date(newSlot.start);
 			var newEnd;
-			if (length) {
-				newEnd = addMinutes(cloneDate(newStart), length);
+			if (endSlot) {
+				newEnd = cloneDate(newStart);
+				var i = newSlot.slotNo;
+				while (i <= endSlot.slotNo) {
+					var s = i===endSlot.slotNo ? endSlot : t.getCoordinateGrid().getSlotForIndex(i);
+					newEnd = addMinutes(newEnd, s.length);
+					i++;
+				}  
 			} 
 			timeElement.text(formatDates(newStart, newEnd, opt('timeFormat')));
 		}
