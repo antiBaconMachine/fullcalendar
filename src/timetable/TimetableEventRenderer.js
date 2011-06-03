@@ -466,6 +466,10 @@ function TimetableEventRenderer() {
 		var slotHeight = getSlotHeight();
 		var slot;
 		var newSlot;
+		var endSlot;
+		var slotRange=0;
+		var col;
+		var newCol;
 		eventElement.draggable({
 			zIndex: 9,
 			scroll: false,
@@ -501,29 +505,36 @@ function TimetableEventRenderer() {
 						}
 					}
 				}, ev, 'drag');
-				slot = t.getCoordinateGrid().getSlotForPosition(getReferencePoint(ui.position.top, ui.helper.height()));
+				slot = t.getCoordinateGrid().getSlotForPosition(getYReferencePoint(ui));
+				endSlot = t.getCoordinateGrid().getSlotForPosition((ui.position.top + ui.helper.height())-1);
+				if (endSlot) {
+					slotRange = endSlot.slotNo - slot.slotNo;
+				}
+				col = t.getCoordinateGrid().getColumnForPosition(getXReferencePoint(ui));
 			},
 			drag: function(ev, ui) {
-				newSlot = t.getCoordinateGrid().getSlotForPosition(getReferencePoint(ui.position.top, ui.helper.height()));
+				newSlot = t.getCoordinateGrid().getSlotForPosition(getYReferencePoint(ui));
+				endSlot = slotRange ? t.getCoordinateGrid().getSlotForIndex(newSlot.slotNo + slotRange) : newSlot;
+				
 				$(".dragOver").removeClass("dragOver");
 				$(".fc-slot"+newSlot.slotNo).addClass("dragOver");
 				
 				if (slot.slotNo != newSlot.slotNo) {
 					if (!allDay) {
-						updateTimeText(newSlot.start, newSlot.length);
+						updateTimeText(newSlot, endSlot);
 					}
-					//console.info("drag to slot %i", newSlot.slotNo);
-					//moveEvent(ev,ui,newSlot);
+					moveEvent(ev,ui,newSlot, slotRange);
 				}
 			},
 			stop: function(ev, ui) {
+				newCol = t.getCoordinateGrid().getColumnForPosition(getXReferencePoint(ui));
 				$(".dragOver").removeClass("dragOver");
 				var cell = hoverListener.stop();
 				clearOverlays();
 				trigger('eventDragStop', eventElement, event, ev, ui);
-				if (slot.slotNo != newSlot.slotNo) {
+				if (slot.slotNo != newSlot.slotNo || col != newCol) {
 					// changed!
-					moveEvent(ev,ui,newSlot);
+					moveEvent(ev,ui,newSlot, slotRange);
 					
 					//reportEventChange(eventId);
 					
@@ -532,14 +543,16 @@ function TimetableEventRenderer() {
 					resetElement();
 					eventElement.css('filter', ''); // clear IE opacity side-effects
 					eventElement.css(origPosition); // sometimes fast drags make event revert to wrong position
-					updateTimeText(0);
 					showEvents(event, eventElement);
 				}
 			}
 		});
 		
-		function getReferencePoint(top, height) {
-			return top //+ (height / 2);
+		function getYReferencePoint(ui) {
+			return ui.position.top + 1;
+		}
+		function getXReferencePoint(ui) {
+			return ui.offset.left + 1;
 		}
 		function getDayDelta(d, nd) {
 			return dayDiff(d,nd);
@@ -547,16 +560,27 @@ function TimetableEventRenderer() {
 		function getMinuteDelta(d,nd) {
 			return (nd.getTime() - d.getTime()) / 60000; 
 		}
-		function moveEvent(ev, ui, slot) {
+		function moveEvent(ev, ui, slot, slotRange) {
+			var endSlot;
+			if (typeof slotRange !== "undefined") {
+				endSlot = t.getCoordinateGrid().getSlotForIndex(slot.slotNo + slotRange);
+			}
+			endSlot = endSlot || slot;
 			ui.helper
 						.css("top", slot.row[0])
-						.css("height", slot.row[1] - slot.row[0]);
+						.css("height", endSlot.row[1] - slot.row[0]);
 		}
-		function updateTimeText(start, length) {
-			var newStart = new Date(start);
+		function updateTimeText(newSlot, endSlot) {
+			var newStart = new Date(newSlot.start);
 			var newEnd;
-			if (length) {
-				newEnd = addMinutes(cloneDate(newStart), length);
+			if (endSlot) {
+				newEnd = cloneDate(newStart);
+				var i = newSlot.slotNo;
+				while (i <= endSlot.slotNo) {
+					var s = i===endSlot.slotNo ? endSlot : t.getCoordinateGrid().getSlotForIndex(i);
+					newEnd = addMinutes(newEnd, s.length);
+					i++;
+				}  
 			} 
 			timeElement.text(formatDates(newStart, newEnd, opt('timeFormat')));
 		}

@@ -307,7 +307,8 @@ function TimetableView(element, calendar, viewName) {
 					$("<th>")
 					.addClass("fc-timetable-axis")
 					.addClass(headerClass)
-					.html(slotCnt + ": " + formatDate(d, opt('axisFormat')) + " " + slotLabel)	
+					.html(slotLabel)
+					.attr("title",formatDate(d, opt('axisFormat')))
 					)
 				.append(
 					$("<td>")
@@ -611,21 +612,21 @@ function TimetableView(element, calendar, viewName) {
 	
 	
 	coordinateGrid = new CoordinateGrid(function(rows, cols) {
-		var e, n, p;
+		var e, nx, p, ny;
 		dayHeadCells.each(function(i, _e) {
 			e = $(_e);
-			n = e.offset().left;
+			nx = e.offset().left;
 			if (i) {
-				p[1] = n;
+				p[1] = nx;
 			}
-			p = [n];
+			p = [nx];
 			cols[i] = p;
 		});
-		p[1] = n + e.outerWidth();
+		p[1] = nx + e.outerWidth();
 		if (opt('allDaySlot')) {
 			e = allDayRow;
-			n = e.offset().top;
-			rows[0] = [n, n+e.outerHeight()];
+			ny = e.offset().top;
+			rows[0] = [ny, ny+e.outerHeight()];
 		}
 		var slotTableTop = 0;
 		var slotScrollerTop = 0;
@@ -645,9 +646,9 @@ function TimetableView(element, calendar, viewName) {
 			currentTop = nextTop;
 		}
 		
-		//Hack an extra function in to do reverse lookups based on a position
+		//Hack in extra functions to do reverse lookups based on a position
 		coordinateGrid.getSlotForPosition = function(y) {
-			y-=slotTableTop;
+			y = Math.round(y);
 		  var slot = null;
 			var len = rows.length;
 			var row;
@@ -661,15 +662,41 @@ function TimetableView(element, calendar, viewName) {
 			}
 			if (slot) {
 				slot = allDay ? slot-1 : slot;
-				return $.extend(getSlotData(slot), {
-					slotNo : slot,
-					row : row
-				});
+				return coordinateGrid.getSlotForIndex(slot, row);
 			} else {
 				return slot;
 			}
-		}
+		};
+		
+		coordinateGrid.getSlotForIndex = function(i,row) {
+			var sd = getSlotData(i);
+			if (sd) {
+				if (!row) {
+					row = opt('allDaySlot') ? rows[i+1] : rows[i];
+				}
+			 sd = $.extend(sd, {
+					slotNo : i,
+					row : row
+				});
+			}
+			return sd;
+		};
+		
+		coordinateGrid.getColumnForPosition = function(x) {
+			x = Math.round(x);
+			var len = cols.length;
+			var col;
+			for (var i = 0; i < len; i++) {
+				col = cols[i];
+				if (x >= col[0] && x < col[1]) {
+					break;
+				}
+				col = null;
+			}
+			return col;
+		};
 	});
+	
 	
 	
 	hoverListener = new HoverListener(coordinateGrid);
