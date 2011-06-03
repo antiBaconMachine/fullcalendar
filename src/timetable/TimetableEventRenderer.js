@@ -450,6 +450,12 @@ function TimetableEventRenderer() {
 		}
 	}
 	
+	function getYReferencePoint(ui) {
+		return ui.position.top + 1;
+	}
+	function getXReferencePoint(ui) {
+		return ui.offset.left + 1;
+	}
 	
 	// when event starts out IN TIMESLOTS
 	
@@ -548,12 +554,6 @@ function TimetableEventRenderer() {
 			}
 		});
 		
-		function getYReferencePoint(ui) {
-			return ui.position.top + 1;
-		}
-		function getXReferencePoint(ui) {
-			return ui.offset.left + 1;
-		}
 		function getDayDelta(d, nd) {
 			return dayDiff(d,nd);
 		}
@@ -603,7 +603,8 @@ function TimetableEventRenderer() {
 	function resizableSlotEvent(event, eventElement, timeElement) {
 		var slotDelta, prevSlotDelta;
 		var slotHeight = getSlotHeight();
-		var slot;
+		var startSlot;
+		var stopSlot;
 		eventElement.resizable({
 			handles: {
 				s: 'div.ui-resizable-s'
@@ -615,27 +616,27 @@ function TimetableEventRenderer() {
 				hideEvents(event, eventElement);
 				eventElement.css('z-index', 9);
 				trigger('eventResizeStart', this, event, ev, ui);
-				slot = t.getCoordinateGrid().getSlotForPosition(ui.position.top + ui.helper.height() - 10);
+				startSlot = t.getCoordinateGrid().getSlotForPosition(getYReferencePoint(ui));
+				stopSlot = t.getCoordinateGrid().getSlotForPosition(ui.position.top + ui.helper.height() - 1);
 			},
 			resize: function(ev, ui) {
-				var newSlot = t.getCoordinateGrid().getSlotForPosition(ui.position.top + ui.helper.height() - 10);
-				if (slot.slotNo != newSlot.slotNo) {
+				var newStopSlot = t.getCoordinateGrid().getSlotForPosition(ui.position.top + ui.helper.height() - 10);
+				if (stopSlot.slotNo != newStopSlot.slotNo) {
 					
-					//TODO: fix zeroDate to actually be zero
-					var start = new Date(newSlot.start);
-					event.end = clearTime(cloneDate(event.start));
+					var start = new Date(newStopSlot.start);
+					event.end = clearTime(new Date(startSlot.start));
 					event.end.setHours(start.getHours());
 					event.end.setMinutes(start.getMinutes());
-					addMinutes(event.end, newSlot.length);
+					addMinutes(event.end, newStopSlot.length);
 					
 					timeElement.text(
 						formatDates(
-							event.start,
+							new Date(startSlot.start),
 							event.end,
 							opt('timeFormat')
 						)
 					);
-					var newHeight = newSlot.row[1] - ui.position.top;	
+					var newHeight = newStopSlot.row[1] - ui.position.top;	
 					ui.helper.css("height", newHeight);	
 					
 				}
