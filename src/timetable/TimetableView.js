@@ -661,15 +661,18 @@ function TimetableView(element, calendar, viewName) {
 			}
 			if (slot) {
 				slot = allDay ? slot-1 : slot;
-				return coordinateGrid.getSlotForIndex(slot);
+				return coordinateGrid.getSlotForIndex(slot, row);
 			} else {
 				return slot;
 			}
 		};
 		
-		coordinateGrid.getSlotForIndex = function(i) {
+		coordinateGrid.getSlotForIndex = function(i,row) {
 			var sd = getSlotData(i);
 			if (sd) {
+				if (!row) {
+					row = opt('allDaySlot') ? rows[i+1] : rows[i];
+				}
 			 sd = $.extend(sd, {
 					slotNo : i,
 					row : row
