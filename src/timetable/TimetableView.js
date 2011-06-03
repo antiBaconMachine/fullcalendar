@@ -307,7 +307,8 @@ function TimetableView(element, calendar, viewName) {
 					$("<th>")
 					.addClass("fc-timetable-axis")
 					.addClass(headerClass)
-					.html(slotCnt + ": " + formatDate(d, opt('axisFormat')) + " " + slotLabel)	
+					.html(slotLabel)
+					.attr("title",formatDate(d, opt('axisFormat')))
 					)
 				.append(
 					$("<td>")
