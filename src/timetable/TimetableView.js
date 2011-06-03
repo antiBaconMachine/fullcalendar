@@ -343,7 +343,7 @@ function TimetableView(element, calendar, viewName) {
 		if (typeof i === "undefined") {
 			return slotHeight;
 		} 
-		return $("#calendar .fc-slot"+i).height();
+		return $("#calendar .fc-slot"+i+":visible").height();
 	}
 	
 	/*Slot patterns can be passed as simple int lengths or complex objects. If
