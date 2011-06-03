@@ -661,13 +661,21 @@ function TimetableView(element, calendar, viewName) {
 			}
 			if (slot) {
 				slot = allDay ? slot-1 : slot;
-				return $.extend(getSlotData(slot), {
-					slotNo : slot,
-					row : row
-				});
+				return coordinateGrid.getSlotForIndex(slot);
 			} else {
 				return slot;
 			}
+		};
+		
+		coordinateGrid.getSlotForIndex = function(i) {
+			var sd = getSlotData(i);
+			if (sd) {
+			 sd = $.extend(sd, {
+					slotNo : i,
+					row : row
+				});
+			}
+			return sd;
 		};
 		
 		coordinateGrid.getColumnForPosition = function(x) {
@@ -682,8 +690,9 @@ function TimetableView(element, calendar, viewName) {
 				col = null;
 			}
 			return col;
-		}
+		};
 	});
+	
 	
 	
 	hoverListener = new HoverListener(coordinateGrid);

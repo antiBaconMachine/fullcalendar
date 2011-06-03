@@ -469,7 +469,6 @@ function TimetableEventRenderer() {
 		var slotRange=0;
 		var col;
 		var newCol;
-		//var i=0;
 		eventElement.draggable({
 			zIndex: 9,
 			scroll: false,
@@ -510,16 +509,10 @@ function TimetableEventRenderer() {
 				if (endSlot) {
 					slotRange = endSlot.slotNo - slot.slotNo;
 				}
-				console.info(slotRange);
 				col = t.getCoordinateGrid().getColumnForPosition(getXReferencePoint(ui));
 			},
 			drag: function(ev, ui) {
 				newSlot = t.getCoordinateGrid().getSlotForPosition(getYReferencePoint(ui));
-				
-				/*i++;
-				if (!(i % 25)) {
-					console.info(slot.slotNo, newSlot.slotNo);
-				}*/
 				$(".dragOver").removeClass("dragOver");
 				$(".fc-slot"+newSlot.slotNo).addClass("dragOver");
 				
@@ -528,13 +521,10 @@ function TimetableEventRenderer() {
 						updateTimeText(newSlot.start, newSlot.length);
 					}
 					moveEvent(ev,ui,newSlot, slotRange);
-					//console.info("drag to slot %i", newSlot.slotNo);
-					//moveEvent(ev,ui,newSlot);
 				}
 			},
 			stop: function(ev, ui) {
 				newCol = t.getCoordinateGrid().getColumnForPosition(getXReferencePoint(ui));
-				console.info(slot.slotNo, newSlot.slotNo, " ",  col, " ", newCol);
 				$(".dragOver").removeClass("dragOver");
 				var cell = hoverListener.stop();
 				clearOverlays();
@@ -571,7 +561,7 @@ function TimetableEventRenderer() {
 		function moveEvent(ev, ui, slot, slotRange) {
 			var endSlot;
 			if (typeof slotRange !== "undefined") {
-				endSlot = t.getSlotData(slot.slotNo + slotRange);
+				endSlot = t.getCoordinateGrid().getSlotForIndex(slot.slotNo + slotRange);
 			}
 			endSlot = endSlot || slot;
 			ui.helper
