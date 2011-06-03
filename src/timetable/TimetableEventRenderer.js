@@ -466,6 +466,7 @@ function TimetableEventRenderer() {
 		var slotHeight = getSlotHeight();
 		var slot;
 		var newSlot;
+		var slotRange=0;
 		var col;
 		var newCol;
 		//var i=0;
@@ -505,10 +506,16 @@ function TimetableEventRenderer() {
 					}
 				}, ev, 'drag');
 				slot = t.getCoordinateGrid().getSlotForPosition(getYReferencePoint(ui));
+				var endSlot = t.getCoordinateGrid().getSlotForPosition((ui.position.top + ui.helper.height())-1);
+				if (endSlot) {
+					slotRange = endSlot.slotNo - slot.slotNo;
+				}
+				console.info(slotRange);
 				col = t.getCoordinateGrid().getColumnForPosition(getXReferencePoint(ui));
 			},
 			drag: function(ev, ui) {
 				newSlot = t.getCoordinateGrid().getSlotForPosition(getYReferencePoint(ui));
+				
 				/*i++;
 				if (!(i % 25)) {
 					console.info(slot.slotNo, newSlot.slotNo);
@@ -520,6 +527,7 @@ function TimetableEventRenderer() {
 					if (!allDay) {
 						updateTimeText(newSlot.start, newSlot.length);
 					}
+					moveEvent(ev,ui,newSlot, slotRange);
 					//console.info("drag to slot %i", newSlot.slotNo);
 					//moveEvent(ev,ui,newSlot);
 				}
@@ -533,7 +541,7 @@ function TimetableEventRenderer() {
 				trigger('eventDragStop', eventElement, event, ev, ui);
 				if (slot.slotNo != newSlot.slotNo || col != newCol) {
 					// changed!
-					moveEvent(ev,ui,newSlot);
+					moveEvent(ev,ui,newSlot, slotRange);
 					
 					//reportEventChange(eventId);
 					
@@ -542,7 +550,7 @@ function TimetableEventRenderer() {
 					resetElement();
 					eventElement.css('filter', ''); // clear IE opacity side-effects
 					eventElement.css(origPosition); // sometimes fast drags make event revert to wrong position
-					updateTimeText(0);
+					//updateTimeText(0);
 					showEvents(event, eventElement);
 				}
 			}
@@ -560,10 +568,15 @@ function TimetableEventRenderer() {
 		function getMinuteDelta(d,nd) {
 			return (nd.getTime() - d.getTime()) / 60000; 
 		}
-		function moveEvent(ev, ui, slot) {
+		function moveEvent(ev, ui, slot, slotRange) {
+			var endSlot;
+			if (typeof slotRange !== "undefined") {
+				endSlot = t.getSlotData(slot.slotNo + slotRange);
+			}
+			endSlot = endSlot || slot;
 			ui.helper
 						.css("top", slot.row[0])
-						.css("height", slot.row[1] - slot.row[0]);
+						.css("height", endSlot.row[1] - slot.row[0]);
 		}
 		function updateTimeText(start, length) {
 			var newStart = new Date(start);
