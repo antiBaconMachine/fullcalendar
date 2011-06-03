@@ -598,8 +598,12 @@ function TimetableEventRenderer() {
 				if (slot.slotNo != newSlot.slotNo) {
 					console.info(slot, newSlot);
 					console.info(event.start, event.end);
+					var start = new Date(newSlot.start);
+					event.end = clearTime(cloneDate(event.start));
+					event.end.setHours(start.getHours());
+					event.end.setMinutes(start.getMinutes());
+					addMinutes(event.end, newSlot.length);
 					
-					event.end = addMinutes(cloneDate(event.start), slot.length + (slotStart.getHours()* 60) + slotStart.getMinutes());
 					console.info(event.end);
 					timeElement.text(
 						formatDates(
@@ -608,7 +612,8 @@ function TimetableEventRenderer() {
 							opt('timeFormat')
 						)
 					);
-					ui.helper.css("height", newSlot.row[1]);	
+					var newHeight = newSlot.row[1] - ui.position.top;	
+					ui.helper.css("height", newHeight);	
 					
 				}
 			},
