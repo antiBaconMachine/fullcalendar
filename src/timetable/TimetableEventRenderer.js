@@ -466,6 +466,9 @@ function TimetableEventRenderer() {
 		var slotHeight = getSlotHeight();
 		var slot;
 		var newSlot;
+		var col;
+		var newCol;
+		//var i=0;
 		eventElement.draggable({
 			zIndex: 9,
 			scroll: false,
@@ -501,10 +504,15 @@ function TimetableEventRenderer() {
 						}
 					}
 				}, ev, 'drag');
-				slot = t.getCoordinateGrid().getSlotForPosition(getReferencePoint(ui.position.top, ui.helper.height()));
+				slot = t.getCoordinateGrid().getSlotForPosition(getYReferencePoint(ui));
+				col = t.getCoordinateGrid().getColumnForPosition(getXReferencePoint(ui));
 			},
 			drag: function(ev, ui) {
-				newSlot = t.getCoordinateGrid().getSlotForPosition(getReferencePoint(ui.position.top, ui.helper.height()));
+				newSlot = t.getCoordinateGrid().getSlotForPosition(getYReferencePoint(ui));
+				/*i++;
+				if (!(i % 25)) {
+					console.info(slot.slotNo, newSlot.slotNo);
+				}*/
 				$(".dragOver").removeClass("dragOver");
 				$(".fc-slot"+newSlot.slotNo).addClass("dragOver");
 				
@@ -517,11 +525,13 @@ function TimetableEventRenderer() {
 				}
 			},
 			stop: function(ev, ui) {
+				newCol = t.getCoordinateGrid().getColumnForPosition(getXReferencePoint(ui));
+				console.info(slot.slotNo, newSlot.slotNo, " ",  col, " ", newCol);
 				$(".dragOver").removeClass("dragOver");
 				var cell = hoverListener.stop();
 				clearOverlays();
 				trigger('eventDragStop', eventElement, event, ev, ui);
-				if (slot.slotNo != newSlot.slotNo) {
+				if (slot.slotNo != newSlot.slotNo || col != newCol) {
 					// changed!
 					moveEvent(ev,ui,newSlot);
 					
@@ -538,8 +548,11 @@ function TimetableEventRenderer() {
 			}
 		});
 		
-		function getReferencePoint(top, height) {
-			return top //+ (height / 2);
+		function getYReferencePoint(ui) {
+			return ui.position.top + 1;
+		}
+		function getXReferencePoint(ui) {
+			return ui.offset.left + 1;
 		}
 		function getDayDelta(d, nd) {
 			return dayDiff(d,nd);
