@@ -59,9 +59,12 @@ function TimetableView(element, calendar, viewName) {
 	t.dragStart = dragStart;
 	t.dragStop = dragStop;
 	t.getSlotData = getSlotData;
-	t.getSlotForPosition = function(y){
-		return coordinateGrid.getSlotForPosition(y);
+	t.getCoordinateGrid = function(){
+		return coordinateGrid;
 	};
+	
+	//TODO remove debugging feature
+	window.getSlotData = getSlotData;
 	
 	
 	// imports
@@ -288,7 +291,7 @@ function TimetableView(element, calendar, viewName) {
 		var totalMinutes = getTotalMinutes(cloneDate(d), maxd);
 		slotCnt = 0;
 		for (i=0; d < maxd; i++) {
-			var slotData = $.extend(getSlotData(i),
+			var slotData = getSlotData(i,
 				{
 					start : d.getTime(),
 					slotNo : i
@@ -327,12 +330,12 @@ function TimetableView(element, calendar, viewName) {
 		axisFirstCells = axisFirstCells.add(slotTable.find('th:first'));
 	}
 	
-	function getSlotData(i) {
+	function getSlotData(i, extra) {
 		var ret = opt('slotMinutes');
 		if (slotPattern) {
 			ret = slotPattern[i] || ret;
 		}
-		return wrapSlotData(ret, slotPattern, i);
+		return wrapSlotData(ret, slotPattern, i, extra);
 	}
 	
 	function getPixelHeight(i) {
@@ -346,15 +349,18 @@ function TimetableView(element, calendar, viewName) {
 	 *the pattern is not long enough it is padded with default length slots.
 	 *We wrap all possibilities into objects here for consistency
 	 */
-	function wrapSlotData(d, slotPattern, i) {
+	function wrapSlotData(d, slotPattern, i, extra) {
 		if (typeof d !== "object") {
 			d = {
 				length : d,
 				title : null
 			}
-			if (slotPattern && typeof i !== "undefined") {
-				slotPattern[i] = d;
-			}
+		}
+		if (extra) {
+			$.extend(d, extra);
+		}
+		if (slotPattern && typeof i !== "undefined") {
+			slotPattern[i] = d;
 		}
 		return d;
 	}
@@ -621,8 +627,8 @@ function TimetableView(element, calendar, viewName) {
 			n = e.offset().top;
 			rows[0] = [n, n+e.outerHeight()];
 		}
-		var slotTableTop = slotScroller.position().top;
-		var slotScrollerTop = slotTableTop;
+		var slotTableTop = 0;
+		var slotScrollerTop = 0;
 		var slotScrollerBottom = slotScrollerTop + slotContent.outerHeight();
 		function constrain(n) {
 			return Math.max(slotScrollerTop, Math.min(slotScrollerBottom, n));
@@ -645,7 +651,8 @@ function TimetableView(element, calendar, viewName) {
 		  var slot = null;
 			var len = rows.length;
 			var row;
-			for (var i=0; i<len; i++) {
+			var allDay = opt('allDaySlot');
+			for (	var i =  allDay ? 1 : 0; i<len; i++) {
 				row = rows[i];
 				if (y >= row[0] && y < row[1] ) {
 					slot = i;
@@ -653,6 +660,7 @@ function TimetableView(element, calendar, viewName) {
 				}
 			}
 			if (slot) {
+				slot = allDay ? slot-1 : slot;
 				return $.extend(getSlotData(slot), {
 					slotNo : slot,
 					row : row

@@ -465,6 +465,7 @@ function TimetableEventRenderer() {
 		var colWidth = getColWidth();
 		var slotHeight = getSlotHeight();
 		var slot;
+		var newSlot;
 		eventElement.draggable({
 			zIndex: 9,
 			scroll: false,
@@ -500,43 +501,31 @@ function TimetableEventRenderer() {
 						}
 					}
 				}, ev, 'drag');
-				slot = t.getSlotForPosition(getMidpoint(ui.position.top, ui.helper.height()));
+				slot = t.getCoordinateGrid().getSlotForPosition(getReferencePoint(ui.position.top, ui.helper.height()));
 			},
 			drag: function(ev, ui) {
-				var newSlot = t.getSlotForPosition(getMidpoint(ui.position.top, ui.helper.height()));
-				//minuteDelta = Math.round((ui.position.top - origPosition.top) / getSlotHeight()) * t.getSlotData(slot).length;
-				//console.info(ui.position.top, origPosition.top, getSlotHeight(), t.getSlotData(slot.index).length, slot, minuteDelta);
+				newSlot = t.getCoordinateGrid().getSlotForPosition(getReferencePoint(ui.position.top, ui.helper.height()));
+				
+				$("tr").css("background-color","transparent").filter(".fc-slot"+newSlot.slotNo).css("background-color", "red");
 				
 				if (slot.slotNo != newSlot.slotNo) {
 					if (!allDay) {
-						if (newSlot.slotNo > slot.slotNo) {
-							minuteDelta += newSlot.length;
-						} else {
-							minuteDelta -= newSlot.length;
-						}
-						updateTimeText(minuteDelta, newSlot.length);
+						updateTimeText(newSlot.start, newSlot.length);
 					}
-					console.info("drag to slot %i %o, delta %i %o %o", slot.slotNo, slot, minuteDelta, ev, ui);
-					slot = newSlot;
-					ui.helper
-						.css("top", slot.row[0])
-						.css("height", slot.row[1] - slot.row[0]);
+					//console.info("drag to slot %i", newSlot.slotNo);
+					//moveEvent(ev,ui,newSlot);
 				}
-				
-				/*if (minuteDelta != prevMinuteDelta) {
-					if (!allDay) {
-						updateTimeText(minuteDelta);
-					}
-					prevMinuteDelta = minuteDelta;
-				}*/
 			},
 			stop: function(ev, ui) {
 				var cell = hoverListener.stop();
 				clearOverlays();
 				trigger('eventDragStop', eventElement, event, ev, ui);
-				if (cell && (dayDelta || minuteDelta || allDay)) {
+				if (slot.slotNo != newSlot.slotNo) {
 					// changed!
-					eventDrop(this, event, dayDelta, allDay ? 0 : minuteDelta, allDay, ev, ui);
+					moveEvent(ev,ui,newSlot);
+					
+					//reportEventChange(eventId);
+					
 				}else{
 					// either no change or out-of-bounds (draggable has already reverted)
 					resetElement();
@@ -548,17 +537,26 @@ function TimetableEventRenderer() {
 			}
 		});
 		
-		function getMidpoint(top, height) {
-			return top + (height / 2);
+		function getReferencePoint(top, height) {
+			return top //+ (height / 2);
 		}
-		function updateTimeText(startMinuteDelta, length) {
-			var newStart = addMinutes(cloneDate(event.start), startMinuteDelta);
+		function getDayDelta(d, nd) {
+			return dayDiff(d,nd);
+		}
+		function getMinuteDelta(d,nd) {
+			return (nd.getTime() - d.getTime()) / 60000; 
+		}
+		function moveEvent(ev, ui, slot) {
+			ui.helper
+						.css("top", slot.row[0])
+						.css("height", slot.row[1] - slot.row[0]);
+		}
+		function updateTimeText(start, length) {
+			var newStart = new Date(start);
 			var newEnd;
 			if (length) {
 				newEnd = addMinutes(cloneDate(newStart), length);
-			} else if (event.end) {
-				newEnd = addMinutes(cloneDate(event.end), startMinuteDelta);
-			}
+			} 
 			timeElement.text(formatDates(newStart, newEnd, opt('timeFormat')));
 		}
 		function resetElement() {
@@ -580,36 +578,47 @@ function TimetableEventRenderer() {
 	function resizableSlotEvent(event, eventElement, timeElement) {
 		var slotDelta, prevSlotDelta;
 		var slotHeight = getSlotHeight();
+		var slot;
 		eventElement.resizable({
 			handles: {
 				s: 'div.ui-resizable-s'
 			},
 			grid: slotHeight,
 			start: function(ev, ui) {
+				t.getCoordinateGrid().build();
 				slotDelta = prevSlotDelta = 0;
 				hideEvents(event, eventElement);
 				eventElement.css('z-index', 9);
 				trigger('eventResizeStart', this, event, ev, ui);
+				slot = t.getCoordinateGrid().getSlotForPosition(ui.position.top + ui.helper.height() - 10);
 			},
 			resize: function(ev, ui) {
-				// don't rely on ui.size.height, doesn't take grid into account
-				slotDelta = Math.round((Math.max(slotHeight, eventElement.height()) - ui.originalSize.height) / slotHeight);
-				if (slotDelta != prevSlotDelta) {
+				var newSlot = t.getCoordinateGrid().getSlotForPosition(ui.position.top + ui.helper.height() - 10);
+				if (slot.slotNo != newSlot.slotNo) {
+					
+					//TODO: fix zeroDate to actually be zero
+					var start = new Date(newSlot.start);
+					event.end = clearTime(cloneDate(event.start));
+					event.end.setHours(start.getHours());
+					event.end.setMinutes(start.getMinutes());
+					addMinutes(event.end, newSlot.length);
+					
 					timeElement.text(
 						formatDates(
 							event.start,
-							(!slotDelta && !event.end) ? null : // no change, so don't display time range
-								addMinutes(eventEnd(event), opt('slotMinutes')*slotDelta),
+							event.end,
 							opt('timeFormat')
 						)
 					);
-					prevSlotDelta = slotDelta;
+					var newHeight = newSlot.row[1] - ui.position.top;	
+					ui.helper.css("height", newHeight);	
+					
 				}
 			},
 			stop: function(ev, ui) {
 				trigger('eventResizeStop', this, event, ev, ui);
 				if (slotDelta) {
-					eventResize(this, event, 0, opt('slotMinutes')*slotDelta, ev, ui);
+					//eventResize(this, event, 0, opt('slotMinutes')*slotDelta, ev, ui);
 				}else{
 					eventElement.css('z-index', 8);
 					showEvents(event, eventElement);
