@@ -505,8 +505,8 @@ function TimetableEventRenderer() {
 			},
 			drag: function(ev, ui) {
 				newSlot = t.getCoordinateGrid().getSlotForPosition(getReferencePoint(ui.position.top, ui.helper.height()));
-				
-				$("tr").css("background-color","transparent").filter(".fc-slot"+newSlot.slotNo).css("background-color", "red");
+				$(".dragOver").removeClass("dragOver");
+				$(".fc-slot"+newSlot.slotNo).addClass("dragOver");
 				
 				if (slot.slotNo != newSlot.slotNo) {
 					if (!allDay) {
@@ -517,6 +517,7 @@ function TimetableEventRenderer() {
 				}
 			},
 			stop: function(ev, ui) {
+				$(".dragOver").removeClass("dragOver");
 				var cell = hoverListener.stop();
 				clearOverlays();
 				trigger('eventDragStop', eventElement, event, ev, ui);
