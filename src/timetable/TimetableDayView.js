@@ -20,7 +20,7 @@ function TimetableDayView(element, calendar) {
 	function render(date, delta) {
 		if (delta) {
 			addDays(date, delta);
-			if (t.getWeekends()) {
+			if (!opt('weekends')) {
 				skipWeekend(date, delta < 0 ? -1 : 1);
 			}
 		}

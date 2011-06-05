@@ -130,7 +130,7 @@ function TimetableView(element, calendar, viewName) {
 	var minMinute, maxMinute;
 	var colFormat;
 	
-	var slotPattern = opt('slotPattern');
+	var slotPattern;
 
 	/* Rendering
 	-----------------------------------------------------------------------------*/
@@ -141,8 +141,17 @@ function TimetableView(element, calendar, viewName) {
 	
 	function renderAgenda(c) {
 		colCnt = c;
+		//Timetables intervals can differ between days so we have to force
+		//a rerender of the slot table between days
+		if (viewName === "timetableDay" && dayTable) {
+		 dayTable.remove();
+		 dayTable = null;
+		 //TODO: scope these so more than one calendar can be on a page
+		 $(".fc-timetable-slots").remove();
+		 $(".fc-timetable-allday").remove();
+		}
 		updateOptions();
-		if (viewName === "timetableDay" || !dayTable) {
+		if (!dayTable) {
 			slotPattern = opt('slotPattern');
 			buildSkeleton();
 		}else{
