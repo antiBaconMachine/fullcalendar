@@ -17,7 +17,13 @@
 				right: 'timetableWeek,  timetableDay, agendaWeek'
 			},
 			editable: true,
-			weekends : true,
+			weekends : {
+			 basic : true,
+			 timetable : {
+			  week : false,
+			  day : true
+			 }
+			},
 			slotMinutes : 60,
 			slotPattern : {
 				timetable : {

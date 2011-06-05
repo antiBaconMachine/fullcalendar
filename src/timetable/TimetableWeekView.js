@@ -25,7 +25,7 @@ function TimetableWeekView(element, calendar) {
 		var end = addDays(cloneDate(start), 7);
 		var visStart = cloneDate(start);
 		var visEnd = cloneDate(end);
-		var weekends = opt('weekends');
+		var weekends = t.getWeekends();
 		if (!weekends) {
 			skipWeekend(visStart);
 			skipWeekend(visEnd, -1, true);
@@ -41,6 +41,4 @@ function TimetableWeekView(element, calendar) {
 		t.visEnd = visEnd;
 		renderAgenda(weekends ? 7 : 5);
 	}
-	
-
 }

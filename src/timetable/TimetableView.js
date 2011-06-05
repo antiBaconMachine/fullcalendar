@@ -62,6 +62,7 @@ function TimetableView(element, calendar, viewName) {
 	t.getCoordinateGrid = function(){
 		return coordinateGrid;
 	};
+	t.getWeekends = getWeekends;
 	
 	//TODO remove debugging feature
 	window.getSlotData = getSlotData;
@@ -141,19 +142,34 @@ function TimetableView(element, calendar, viewName) {
 	function renderAgenda(c) {
 		colCnt = c;
 		updateOptions();
-		if (!dayTable) {
+		if (viewName === "timetableDay" || !dayTable) {
+			slotPattern = opt('slotPattern');
 			buildSkeleton();
 		}else{
 			clearEvents();
 		}
 		updateCells();
 	}
-	
-	
-	
+
+	function getPeriodIdenitifier(viewName) {
+	 if (viewName.indexOf("Day") !== -1) {
+	  return "day";
+	 } else if (viewName.indexOf("Week") !== -1) {
+	  return "week";
+	 } else {
+	  return null;
+	 }
+	}
+	function getWeekends() {
+	 var weekends = opt('weekends');
+	 var period = getPeriodIdenitifier(viewName);
+	 var ret = weekends[period];
+	 return weekends =  typeof ret !== "undefined" ? ret : weekends;
+	}
 	function updateOptions() {
 		tm = opt('theme') ? 'ui' : 'fc';
-		nwe = opt('weekends') ? 0 : 1;
+		nwe = t.getWeekends() ? 0 : 1;
+		console.info("NO WEEKENDS: %i",nwe);
 		firstDay = opt('firstDay');
 		if (rtl = opt('isRTL')) {
 			dis = -1;
