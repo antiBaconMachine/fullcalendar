@@ -178,7 +178,6 @@ function TimetableView(element, calendar, viewName) {
 	function updateOptions() {
 		tm = opt('theme') ? 'ui' : 'fc';
 		nwe = t.getWeekends() ? 0 : 1;
-		console.info("NO WEEKENDS: %i",nwe);
 		firstDay = opt('firstDay');
 		if (rtl = opt('isRTL')) {
 			dis = -1;
