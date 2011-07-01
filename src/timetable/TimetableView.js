@@ -309,13 +309,9 @@ function TimetableView(element, calendar, viewName) {
 			 .append($("<tbody>"))
 			 .children().first();
 		
-		//Hack to allow different slot patterns depending on day
-		var pattern = slotPattern.defaultPattern;
 		if (viewName === "timetableDay") {
-			var day = t.start.getDay();
-			if (day === 6 || day === 0) {
-				pattern = slotPattern.weekend || pattern;
-			}
+			var slotPatternMatcher = opt("slotPatternMatcher");
+			pattern = slotPattern[slotPatternMatcher(t.start)];
 		}
 		slotPattern = pattern;
 		
