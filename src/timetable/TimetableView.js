@@ -309,9 +309,12 @@ function TimetableView(element, calendar, viewName) {
 			 .append($("<tbody>"))
 			 .children().first();
 		
+		var pattern;
 		if (viewName === "timetableDay") {
 			var slotPatternMatcher = opt("slotPatternMatcher");
-			var pattern = slotPattern[slotPatternMatcher(t.start)];
+			pattern = slotPattern[slotPatternMatcher(t.start)];
+		} else {
+			pattern = slotPattern["WEEKDAY"];
 		}
 		slotPattern = pattern || [];
 		
