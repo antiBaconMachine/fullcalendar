@@ -9,7 +9,7 @@
 #calendar .slotScroller .scrollInner {
 	overflow-x: hidden;
 	overflow-y: auto;
-	height:	3000px;
+	height:	1500px;
 }
 
 fc-widget-content .contentDiv {
