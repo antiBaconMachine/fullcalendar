@@ -311,9 +311,9 @@ function TimetableView(element, calendar, viewName) {
 		
 		if (viewName === "timetableDay") {
 			var slotPatternMatcher = opt("slotPatternMatcher");
-			pattern = slotPattern[slotPatternMatcher(t.start)];
+			var pattern = slotPattern[slotPatternMatcher(t.start)];
 		}
-		slotPattern = pattern;
+		slotPattern = pattern || [];
 		
 		d = zeroDate();
 		maxd = addMinutes(cloneDate(d), maxMinute);
