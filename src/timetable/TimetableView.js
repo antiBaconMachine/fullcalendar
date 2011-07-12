@@ -152,7 +152,7 @@ function TimetableView(element, calendar, viewName) {
 		}
 		updateOptions();
 		if (!dayTable) {
-			slotPattern = opt('slotPattern');
+			slotPattern = opt('slotPattern') || [];
 			buildSkeleton();
 		}else{
 			clearEvents();
@@ -333,6 +333,7 @@ function TimetableView(element, calendar, viewName) {
 			minutes = d.getMinutes();
 			s.append(
 				$("<tr>")
+				.addClass('fc-slot')
 				.addClass('fc-slot' + i)
 				.addClass(!minutes ? '' : 'fc-minor')
 				.attr("height", getPercentageHeight(slotData.length, totalMinutes))
