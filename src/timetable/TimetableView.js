@@ -333,6 +333,7 @@ function TimetableView(element, calendar, viewName) {
 			minutes = d.getMinutes();
 			s.append(
 				$("<tr>")
+				.data("slotData", slotData)
 				.addClass('fc-slot')
 				.addClass('fc-slot' + i)
 				.addClass(!minutes ? '' : 'fc-minor')
@@ -571,10 +572,17 @@ function TimetableView(element, calendar, viewName) {
 			var date = colDate(col);
 			var rowMatch = this.parentNode.className.match(/fc-slot(\d+)/); // TODO: maybe use data
 			if (rowMatch) {
-				var mins = parseInt(rowMatch[1]) * opt('slotMinutes');
-				var hours = Math.floor(mins/60);
-				date.setHours(hours);
-				date.setMinutes(mins%60 + minMinute);
+				var slotData = $(this.parentNode).data("slotData");
+				if (slotData) {
+					var calcDate = new Date(slotData.start);
+					date.setHours(calcDate.getHours());
+					date.setMinutes(calcDate.getMinutes());
+				} else {
+					var mins = parseInt(rowMatch[1]) * opt('slotMinutes');
+					var hours = Math.floor(mins/60);
+					date.setHours(hours);
+					date.setMinutes(mins%60 + minMinute);
+				}
 				trigger('dayClick', dayBodyCells[col], date, false, ev);
 			}else{
 				trigger('dayClick', dayBodyCells[col], date, true, ev);
