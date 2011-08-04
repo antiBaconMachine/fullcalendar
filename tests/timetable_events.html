@@ -3,14 +3,15 @@
 	<head>
 		<script type='text/javascript' src='../src/_loader.js?debug'></script>
 		<script type='text/javascript'>
-
+			var c;
 			$(document).ready(function() {
 		
-				$('#calendar').fullCalendar({
+				c = $('#calendar').fullCalendar({
 					defaultView: 'timetableDay',
-					year: 2009,
-					month: 11,
-					date: 16,
+					year: 2011,
+					month: 07,
+					date: 25,
+					firstHour : -1,
 					header: {
 						left: 'prev,next today',
 						center: 'title',
@@ -27,7 +28,7 @@
 					slotMinutes : 60,
 					slotPattern : {
 						timetable : {
-							WEEKDAY : [240,240,30,20,
+							WEEKDAY : [60,60,60,60,240,30,20,
 								{length : 40, 
 									title : "Period 1"
 								},{length : 40, 

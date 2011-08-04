@@ -802,7 +802,8 @@ function TimetableView(element, calendar, viewName) {
 	// get the Y coordinate of the given time on the given day (both Date objects)
 	function timePosition(day, time) { // both date objects. day holds 00:00 of current day
 		day = cloneDate(day, true);
-		if (time < addMinutes(cloneDate(day), minMinute)) {
+		if (time < addMinutes(cloneDate(day), minMinute) || 
+			(time.getHours() === 0 && time.getMinutes() == 0)) {
 			return 0;
 		}
 		if (time >= addMinutes(cloneDate(day), maxMinute)) {
