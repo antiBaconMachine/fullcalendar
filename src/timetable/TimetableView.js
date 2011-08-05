@@ -143,15 +143,11 @@ function TimetableView(element, calendar, viewName) {
 		colCnt = c;
 		//Timetables intervals can differ between days so we have to force
 		//a rerender of the slot table between days
-		if (viewName === "timetableDay" && dayTable) {
-		 dayTable.remove();
-		 dayTable = null;
-		 //TODO: scope these so more than one calendar can be on a page
-		 $(".fc-timetable-slots").remove();
-		 $(".fc-timetable-allday").remove();
+		if (viewName === "timetableDay") {
+			t.element.children().remove();
 		}
 		updateOptions();
-		if (!dayTable) {
+		if (!t.element.children().length) {
 			slotPattern = opt('slotPattern') || [];
 			buildSkeleton();
 		}else{
@@ -160,7 +156,7 @@ function TimetableView(element, calendar, viewName) {
 		updateCells();
 	}
 
-	function getPeriodIdenitifier(viewName) {
+	function getPeriodIdentifier(viewName) {
 	 if (viewName.indexOf("Day") !== -1) {
 	  return "day";
 	 } else if (viewName.indexOf("Week") !== -1) {
@@ -171,7 +167,7 @@ function TimetableView(element, calendar, viewName) {
 	}
 	function getWeekends() {
 	 var weekends = opt('weekends');
-	 var period = getPeriodIdenitifier(viewName);
+	 var period = getPeriodIdentifier(viewName);
 	 var ret = weekends[period];
 	 return weekends =  typeof ret !== "undefined" ? ret : weekends;
 	}
