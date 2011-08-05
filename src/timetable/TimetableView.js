@@ -318,6 +318,7 @@ function TimetableView(element, calendar, viewName) {
 		maxd = addMinutes(cloneDate(d), maxMinute);
 		addMinutes(d, minMinute);
 		var totalMinutes = getTotalMinutes(cloneDate(d), maxd);
+		var minuteHeight = slotScroller.height() / totalMinutes;
 		slotCnt = 0;
 		for (i=0; d < maxd; i++) {
 			var slotData = getSlotData(i,
@@ -327,19 +328,21 @@ function TimetableView(element, calendar, viewName) {
 				});
 			var slotLabel = slotData.title || ((!slotNormal || !minutes) ? formatDate(d, opt('axisFormat')) : '&nbsp;');
 			minutes = d.getMinutes();
+			var rowHeight = (slotData.length * minuteHeight) + 'px';
 			s.append(
 				$("<tr>")
 				.data("slotData", slotData)
 				.addClass('fc-slot')
 				.addClass('fc-slot' + i)
 				.addClass(!minutes ? '' : 'fc-minor')
-				.attr("height", getPercentageHeight(slotData.length, totalMinutes))
+				.css("height", rowHeight)
+				.css("line-height", rowHeight)
 				.append(
 					$("<th>")
 					.addClass("fc-timetable-axis")
 					.addClass(headerClass)
 					.html(slotLabel)
-					.attr("title",formatDate(d, opt('axisFormat')))
+					.attr("title",formatDate(d, opt('axisFormat')) + ' - ' + formatDate(addMinutes(cloneDate(d), slotData.length), opt('axisFormat')))
 					)
 				.append(
 					$("<td>")
@@ -812,24 +815,11 @@ function TimetableView(element, calendar, viewName) {
 		start.setMilliseconds(0);
 		addMinutes(start, minMinute);
 		var slotMinutes = opt('slotMinutes'),
-		minutes = time.getHours()*60 + time.getMinutes() - minMinute,
-		slotI = getSlotCount(start,time),
-		cached = slotTopCache[slotI];
-		
-		//TODO: is this extended cache actually useful? right now it's not
-		if (cached === undefined) {
-			var row = slotTable.find('tr:eq(' + slotI + ')');
-			var div = row.find("td div");
-			cached = slotTopCache[slotI] = {
-				row : row,
-				div : div,
-				slotTop : div.position().top
-			};
-		}
-		
-		return Math.max(0, Math.round(
-			cached.slotTop
-		));
+		minutes = time.getHours()*60 + time.getMinutes() - minMinute;
+		var maxd = addMinutes(cloneDate(day), maxMinute);
+		var totalMinutes = getTotalMinutes(cloneDate(start), maxd);
+		var minuteHeight = slotScroller.height() / totalMinutes;
+		return minutes * minuteHeight;
 	}
 	
 	
