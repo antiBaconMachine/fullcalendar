@@ -43,7 +43,7 @@ function TimetableView(element, calendar, viewName) {
 	t.colContentLeft = colContentLeft;
 	t.colContentRight = colContentRight;
 	t.getDaySegmentContainer = function() {return $("#daySegmentContainer")};
-	t.getSlotSegmentContainer = function() {return $("#slotSegmentContainer")};
+	t.getSlotSegmentContainer = function() {return $("#slotSegmentContainer-" + viewName)};
 	t.getMinMinute = function() {return minMinute};
 	t.getMaxMinute = function() {return maxMinute};
 	t.getBodyContent = function() {return slotContent}; // !!??
@@ -294,7 +294,7 @@ function TimetableView(element, calendar, viewName) {
 				.appendTo(slotScroller);
 				
 		slotSegmentContainer =
-			$("<div id='slotSegmentContainer' style='position:absolute;z-index:8;top:0;left:0'/>")
+			$("<div id='slotSegmentContainer-" + viewName + "' style='position:absolute;z-index:8;top:0;left:0'/>")
 				.appendTo(slotContent);
 		
 		/*This table has been converted to use jQuery builder code mainly so we 
