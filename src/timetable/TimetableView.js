@@ -328,7 +328,7 @@ function TimetableView(element, calendar, viewName) {
 				});
 			var slotLabel = slotData.title || ((!slotNormal || !minutes) ? formatDate(d, opt('axisFormat')) : '&nbsp;');
 			minutes = d.getMinutes();
-			var rowHeight = (slotData.length * minuteHeight) + 'px';
+			var rowHeight = (slotData.length * minuteHeight) - 1 + 'px';
 			s.append(
 				$("<tr>")
 				.data("slotData", slotData)
