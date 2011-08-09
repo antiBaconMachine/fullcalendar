@@ -303,7 +303,7 @@ function TimetableView(element, calendar, viewName) {
 		s =
 			$("<table class='fc-timetable-slots' style='width:100%' cellspacing='0'>") 
 			 .append($("<tbody>"))
-			 .children().first();
+			 .find("tbody").first();
 		
 		var pattern;
 		if (viewName === "timetableDay") {
