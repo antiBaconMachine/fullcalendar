@@ -605,6 +605,11 @@ function TimetableEventRenderer() {
 		var slotHeight = getSlotHeight();
 		var startSlot;
 		var stopSlot;
+		var newStopSlot;
+		var orig;
+		var curr;
+		var dayDelta;
+		var minuteDelta
 		eventElement.resizable({
 			handles: {
 				s: 'div.ui-resizable-s'
@@ -618,21 +623,22 @@ function TimetableEventRenderer() {
 				trigger('eventResizeStart', this, event, ev, ui);
 				startSlot = t.getCoordinateGrid().getSlotForPosition(getYReferencePoint(ui));
 				stopSlot = t.getCoordinateGrid().getSlotForPosition(ui.position.top + ui.helper.height() - 1);
+				orig = new Date(stopSlot.start);
 			},
 			resize: function(ev, ui) {
-				var newStopSlot = t.getCoordinateGrid().getSlotForPosition(ui.position.top + ui.helper.height() - 10);
+				newStopSlot = t.getCoordinateGrid().getSlotForPosition(ui.position.top + ui.helper.height() - 10);
 				if (stopSlot.slotNo != newStopSlot.slotNo) {
 					
-					var start = new Date(newStopSlot.start);
-					event.end = clearTime(new Date(startSlot.start));
-					event.end.setHours(start.getHours());
-					event.end.setMinutes(start.getMinutes());
-					addMinutes(event.end, newStopSlot.length);
+					curr = new Date(newStopSlot.start);
+					var delta = curr.getTime() - orig.getTime();
+					var offset = orig.getTime() - zeroDate().getTime();
+					dayDelta = Math.floor(( offset + delta ) / (1000 * 60 * 60 * 24));
+					minuteDelta = delta / (1000 * 60);
 					
 					timeElement.text(
 						formatDates(
 							new Date(startSlot.start),
-							event.end,
+							new Date(newStopSlot.start),
 							opt('timeFormat')
 						)
 					);
@@ -643,8 +649,8 @@ function TimetableEventRenderer() {
 			},
 			stop: function(ev, ui) {
 				trigger('eventResizeStop', this, event, ev, ui);
-				if (slotDelta) {
-					//eventResize(this, event, 0, opt('slotMinutes')*slotDelta, ev, ui);
+				if (stopSlot.slotNo != newStopSlot.slotNo) {
+					eventResize(this, event, dayDelta , minuteDelta, ev, ui);
 				}else{
 					eventElement.css('z-index', 8);
 					showEvents(event, eventElement);

@@ -10,12 +10,12 @@
 					defaultView: 'timetableDay',
 					year: 2011,
 					month: 07,
-					date: 25,
+					date: 15,
 					firstHour : -1,
 					header: {
 						left: 'prev,next today',
 						center: 'title',
-						right: 'timetableWeek,  timetableDay, month'
+						right: 'agendaWeek timetableWeek,  timetableDay, month'
 					},
 					editable: true,
 					weekends : {
@@ -86,6 +86,9 @@
 					},
 					dayClick : function(date, allDate, jsEvent, view) {
 						console.info(date);
+					},
+					eventResize : function( event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view ) { 
+						console.info( event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view);
 					}
 				});
 		
