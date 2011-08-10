@@ -3,10 +3,10 @@
 	"id":1004,
 	"title":"birthday",
 	"allDay":false,
-	"start":1313416800,
+	"start":1312941600,
 	"description":null,
 	"eventType":"APPOINTMENT",
 	"editable":true,
-	"end":1313420400,
+	"end":1312945200,
 	"url":"/dbgfl/accounts/primary/accounts/springfield/accounts/staff/skinner/calendar?entry=1004-15082011"
 }]

@@ -8,9 +8,7 @@
 		
 				c = $('#calendar').fullCalendar({
 					defaultView: 'timetableDay',
-					year: 2011,
-					month: 07,
-					date: 15,
+					
 					firstHour : -1,
 					header: {
 						left: 'prev,next today',
@@ -89,7 +87,10 @@
 					},
 					eventResize : function( event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view ) { 
 						console.info( event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view);
-					}
+					},
+					viewDisplay : function(view) {
+					jQuery("#calendar .slotScroller .scrollInner").css("height", "auto");
+				}
 				});
 		
 			});

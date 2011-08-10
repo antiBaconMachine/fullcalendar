@@ -817,7 +817,7 @@ function TimetableView(element, calendar, viewName) {
 		minutes = time.getHours()*60 + time.getMinutes() - minMinute;
 		var maxd = addMinutes(cloneDate(day), maxMinute);
 		var totalMinutes = getTotalMinutes(cloneDate(start), maxd);
-		var minuteHeight = slotScroller.height() / totalMinutes;
+		var minuteHeight = slotScroller.find(".scrollInner").height() / totalMinutes;
 		return minutes * minuteHeight;
 	}
 	
